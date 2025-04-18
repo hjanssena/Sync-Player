@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 import 'dart:io';
+import 'package:audiotags/audiotags.dart';
 
 class AudioPlayerScreen extends StatefulWidget {
   const AudioPlayerScreen({super.key});
@@ -52,10 +54,19 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       );
     }
     if (selectedDirectory != null) {
-      var directory = await Directory(selectedDirectory);
+      var directory = Directory(selectedDirectory);
 
-      final List<FileSystemEntity> entities = await directory.list().toList();
-      entities.forEach(print);
+      final List<FileSystemEntity> entities =
+          await directory.list(recursive: true, followLinks: false).toList();
+      for (var entity in entities) {
+        if (entity is File) {
+          Tag? tag = await AudioTags.read(entity.path);
+          print(tag?.title);
+          print(tag?.album);
+          print(tag?.trackArtist);
+          print(tag?.duration);
+        }
+      }
     } else {
       //User cancelled the picker
     }

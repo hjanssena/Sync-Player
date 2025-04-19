@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:audiotags/audiotags.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:sync_player/Models/models.dart';
 import 'package:mime/mime.dart';
 
-class SongList {
+class SongList extends ChangeNotifier {
   List<String> folderPaths = [];
   List<Song> songs = [];
 
@@ -72,6 +73,7 @@ class SongList {
         }
       }
     }
+    notifyListeners();
   }
 
   String fixDuplicatedEndingInPath(String path) {

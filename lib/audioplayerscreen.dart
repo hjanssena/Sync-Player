@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:audio_metadata_reader/audio_metadata_reader.dart';
 import 'dart:io';
 import 'package:audiotags/audiotags.dart';
 
@@ -33,7 +32,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
 
   Future<void> pickAudioFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
-    print(result!.paths);
 
     if (result != null) {
       String filPath = result.files.single.path!;
@@ -61,10 +59,6 @@ class _AudioPlayerScreenState extends State<AudioPlayerScreen> {
       for (var entity in entities) {
         if (entity is File) {
           Tag? tag = await AudioTags.read(entity.path);
-          print(tag?.title);
-          print(tag?.album);
-          print(tag?.trackArtist);
-          print(tag?.duration);
         }
       }
     } else {

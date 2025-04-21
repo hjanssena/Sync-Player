@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/list_screen/list_items.dart';
 import 'package:sync_player/list_screen/main_screen.dart';
+import 'package:sync_player/player/player_widget.dart';
 
 class SongListScreen extends StatelessWidget {
   const SongListScreen({super.key});
@@ -31,9 +32,9 @@ class SongListScreen extends StatelessWidget {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(30),
               child: Hero(
-                tag: screenState.album.name,
+                tag: "${screenState.album.name}album",
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: screenState.album.image,
@@ -60,6 +61,10 @@ class SongListScreen extends StatelessWidget {
             },
           ),
         ],
+      ),
+      bottomNavigationBar: SizedBox(
+        height: 100,
+        child: Hero(tag: "playerwidget", child: PlayerWidget()),
       ),
     );
   }

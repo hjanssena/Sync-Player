@@ -4,23 +4,51 @@ import 'package:audiotags/audiotags.dart';
 class Song {
   String path;
   String title;
-  String artist;
-  String album;
+  String artistTag;
+  String albumTag;
   int duration;
   int year;
   List<Picture> pictures;
   bool scraped;
+  Artist artist = Artist.placeholder();
+  Album album = Album.placeholder();
 
   Song({
     this.path = '',
     this.title = '',
-    this.artist = '',
-    this.album = '',
+    this.artistTag = '',
+    this.albumTag = '',
     this.duration = 0,
     this.year = 0,
     this.pictures = const [],
     this.scraped = false,
   });
+
+  Song? nextInAlbum() {
+    int i = 0;
+
+    while (this != album.songs[i]) {
+      i++;
+    }
+    if (i >= album.songs.length - 1) {
+      return null;
+    } else {
+      return album.songs[i + 1];
+    }
+  }
+
+  Song? previousInAlbum() {
+    int i = 0;
+
+    while (this != album.songs[i]) {
+      i++;
+    }
+    if (i >= 1) {
+      return album.songs[i - 1];
+    } else {
+      return null;
+    }
+  }
 }
 
 class Album {

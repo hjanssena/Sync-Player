@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:audiotags/audiotags.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -8,18 +9,22 @@ import 'package:mime/mime.dart';
 class MusicLibrary extends ChangeNotifier {
   List<String> folderPaths = [];
   List<Artist> artists = [];
+  final List<Song> _allSongs = [];
   List<PlayList> playlists = [];
   final Image placeholder = Image.asset('assets/placeholder.png');
+  bool refreshingList = false;
 
   Future<void> addPath() async {
     String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-    if (Platform.isAndroid) {
-      selectedDirectory = fixDuplicatedEndingInPath(
-        selectedDirectory.toString(),
-      );
+    if (selectedDirectory != null) {
+      if (Platform.isAndroid) {
+        selectedDirectory = fixDuplicatedEndingInPath(
+          selectedDirectory.toString(),
+        );
+      }
+      folderPaths.add(selectedDirectory.toString());
+      refreshList();
     }
-    folderPaths.add(selectedDirectory.toString());
-    refreshList();
   }
 
   void removePath(String path) {
@@ -32,6 +37,8 @@ class MusicLibrary extends ChangeNotifier {
   }
 
   Future<void> refreshList() async {
+    refreshingList = true;
+    notifyListeners();
     for (var path in folderPaths) {
       Directory dir = Directory(path);
       final List<FileSystemEntity> entities =
@@ -48,6 +55,7 @@ class MusicLibrary extends ChangeNotifier {
         }
       }
     }
+    refreshingList = false;
     notifyListeners();
   }
 
@@ -55,8 +63,8 @@ class MusicLibrary extends ChangeNotifier {
     Song song = Song(
       path: entity.path,
       title: tag?.title ?? entity.path.split('/').last.split('.').first,
-      artist: tag?.albumArtist ?? tag?.trackArtist ?? 'Unknown artist',
-      album: tag?.album ?? 'No album',
+      artistTag: tag?.albumArtist ?? tag?.trackArtist ?? 'Unknown artist',
+      albumTag: tag?.album ?? 'No album',
       duration: tag?.duration ?? 0,
       year: tag?.year ?? 2000,
       pictures: tag?.pictures ?? [],
@@ -65,18 +73,21 @@ class MusicLibrary extends ChangeNotifier {
   }
 
   void addSongToLibrary(Song song) {
+    _allSongs.add(song);
     Artist artist = getArtist(song);
+    song.artist = artist;
     Album album = getAlbum(song, artist);
+    song.album = album;
     album.songs.add(song);
   }
 
   ///Gets the artist from the song's metadata, creates a new one if it doesn't exist
   Artist getArtist(Song song) {
     Artist artist = artists.firstWhere(
-      (element) => element.name.toLowerCase() == song.artist.toLowerCase(),
+      (element) => element.name.toLowerCase() == song.artistTag.toLowerCase(),
       orElse: () {
         Artist newArt = Artist(
-          name: song.artist,
+          name: song.artistTag,
           image:
               song.pictures.isNotEmpty
                   ? Image.memory(song.pictures.first.bytes)
@@ -98,10 +109,10 @@ class MusicLibrary extends ChangeNotifier {
   ///Gets the album from the song's metadata, creates a new one if it doesn't exist
   Album getAlbum(Song song, Artist artist) {
     Album album = artist.albums.firstWhere(
-      (element) => element.name.toLowerCase() == song.album.toLowerCase(),
+      (element) => element.name.toLowerCase() == song.albumTag.toLowerCase(),
       orElse: () {
         Album newAlbum = Album(
-          name: song.album,
+          name: song.albumTag,
           image:
               song.pictures.isNotEmpty
                   ? Image.memory(song.pictures.first.bytes)
@@ -113,6 +124,11 @@ class MusicLibrary extends ChangeNotifier {
       },
     );
     return album;
+  }
+
+  Song getRandomSong() {
+    final random = new Random();
+    return _allSongs[random.nextInt(_allSongs.length)];
   }
 
   String fixDuplicatedEndingInPath(String path) {

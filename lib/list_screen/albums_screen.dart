@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:sync_player/Models/models.dart';
 import 'package:sync_player/list_screen/list_items.dart';
 import 'package:sync_player/list_screen/main_screen.dart';
+import 'package:sync_player/player/player_widget.dart';
 
 class AlbumListScreen extends StatelessWidget {
   const AlbumListScreen({super.key});
@@ -22,11 +23,15 @@ class AlbumListScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(height: 15),
-                  Text(
-                    screenState.artist.name,
-                    style: Theme.of(context).textTheme.headlineMedium,
-                    softWrap: false,
+                  SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 50, right: 50),
+                    child: Text(
+                      screenState.artist.name,
+                      style: Theme.of(context).textTheme.headlineMedium,
+                      softWrap: false,
+                      overflow: TextOverflow.fade,
+                    ),
                   ),
                 ],
               ),
@@ -34,9 +39,9 @@ class AlbumListScreen extends StatelessWidget {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(30),
               child: Hero(
-                tag: screenState.artist.name,
+                tag: "${screenState.artist.name}artist",
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: screenState.artist.image,
@@ -85,6 +90,10 @@ class AlbumListScreen extends StatelessWidget {
             },
           ),
         ],
+      ),
+      bottomNavigationBar: SizedBox(
+        height: 100,
+        child: Hero(tag: "playerwidget", child: PlayerWidget()),
       ),
     );
   }

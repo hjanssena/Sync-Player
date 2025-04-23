@@ -10,8 +10,8 @@ class Song {
   int year;
   List<Picture> pictures;
   bool scraped;
-  Artist artist = Artist.placeholder();
-  Album album = Album.placeholder();
+  Artist artist = Artist.empty();
+  Album album = Album.empty();
 
   Song({
     this.path = '',
@@ -51,20 +51,26 @@ class Song {
   }
 }
 
-class Album {
-  final String name;
+class Album extends PlayList {
   final Image image;
-  final List<Song> songs;
 
-  Album({required this.name, required this.image, required this.songs});
+  Album({required super.name, required super.songs, required this.image});
 
-  static Album placeholder() {
+  ///Returns an empty album
+  static Album empty() {
     return Album(
       name: '',
       image: Image.asset('assets/placeholder.png'),
       songs: [],
     );
   }
+}
+
+class PlayList {
+  final String name;
+  final List<Song> songs;
+
+  PlayList({required this.name, required this.songs});
 }
 
 class Artist {
@@ -74,7 +80,8 @@ class Artist {
 
   Artist({required this.name, required this.image, required this.albums});
 
-  static Artist placeholder() {
+  ///Returns an empty artist
+  static Artist empty() {
     return Artist(
       name: '',
       image: Image.asset('assets/placeholder.png'),
@@ -82,6 +89,7 @@ class Artist {
     );
   }
 
+  ///Returns all the artist's song from all the albums
   List<Song> allSongs() {
     List<Song> allSongs = [];
     for (Album album in albums) {
@@ -89,9 +97,4 @@ class Artist {
     }
     return allSongs;
   }
-}
-
-class PlayList {
-  String name = '';
-  List<Song> songList = [];
 }

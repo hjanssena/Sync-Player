@@ -13,6 +13,10 @@ class AlbumListScreen extends StatelessWidget {
     final ListScreenState screenState = context.read<ListScreenState>();
     final List<Song> allArtistSongs = screenState.artist.allSongs();
     allArtistSongs.shuffle();
+    final PlayList randomizedPlayList = PlayList(
+      name: "Random ${screenState.artist.name}",
+      songs: allArtistSongs,
+    );
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
@@ -86,15 +90,15 @@ class AlbumListScreen extends StatelessWidget {
           SliverList.builder(
             itemCount: allArtistSongs.length,
             itemBuilder: (context, index) {
-              return SongItem(song: allArtistSongs[index]);
+              return SongItem(
+                song: allArtistSongs[index],
+                currentPlaylistOnScreen: randomizedPlayList,
+              );
             },
           ),
         ],
       ),
-      bottomNavigationBar: SizedBox(
-        height: 100,
-        child: Hero(tag: "playerwidget", child: PlayerWidget()),
-      ),
+      bottomNavigationBar: PlayerWidget(),
     );
   }
 }

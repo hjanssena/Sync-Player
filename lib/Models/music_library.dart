@@ -11,10 +11,11 @@ class MusicLibrary extends ChangeNotifier {
   List<Artist> artists = [];
   final List<Song> _allSongs = [];
   List<PlayList> playlists = [];
-  final Image placeholder = Image.asset('assets/placeholder.png');
+  final Image _placeholder = Image.asset('assets/placeholder.png');
   bool refreshingList = false;
 
-  Future<void> addPath() async {
+  ///Opens a dialog box to select and add a source directory.
+  Future<void> addSourceDirectory() async {
     String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
     if (selectedDirectory != null) {
       if (Platform.isAndroid) {
@@ -27,7 +28,8 @@ class MusicLibrary extends ChangeNotifier {
     }
   }
 
-  void removePath(String path) {
+  ///Removes directory from the library sources
+  void removeSourceDirectory(String path) {
     folderPaths.removeWhere((current) => path == current);
     refreshList();
   }
@@ -36,6 +38,7 @@ class MusicLibrary extends ChangeNotifier {
     return artists.isEmpty ? true : false;
   }
 
+  ///Scans all registered directories and re-generates all the library
   Future<void> refreshList() async {
     refreshingList = true;
     notifyListeners();
@@ -72,6 +75,7 @@ class MusicLibrary extends ChangeNotifier {
     return song;
   }
 
+  ///Registers the song with it's corresponding album and artist, and adds it to the allsongs library
   void addSongToLibrary(Song song) {
     _allSongs.add(song);
     Artist artist = getArtist(song);
@@ -91,7 +95,7 @@ class MusicLibrary extends ChangeNotifier {
           image:
               song.pictures.isNotEmpty
                   ? Image.memory(song.pictures.first.bytes)
-                  : placeholder,
+                  : _placeholder,
           albums: [],
         );
         artists.add(newArt);
@@ -99,8 +103,8 @@ class MusicLibrary extends ChangeNotifier {
       },
     );
     if (song.pictures.isNotEmpty &&
-        artist.image == placeholder &&
-        Image.memory(song.pictures.first.bytes) != placeholder) {
+        artist.image == _placeholder &&
+        Image.memory(song.pictures.first.bytes) != _placeholder) {
       artist.image = Image.memory(song.pictures.first.bytes);
     }
     return artist;
@@ -116,7 +120,7 @@ class MusicLibrary extends ChangeNotifier {
           image:
               song.pictures.isNotEmpty
                   ? Image.memory(song.pictures.first.bytes)
-                  : placeholder,
+                  : _placeholder,
           songs: [],
         );
         artist.albums.add(newAlbum);
@@ -126,8 +130,9 @@ class MusicLibrary extends ChangeNotifier {
     return album;
   }
 
+  ///Returns a random song from all the songs in the library
   Song getRandomSong() {
-    final random = new Random();
+    final random = Random();
     return _allSongs[random.nextInt(_allSongs.length)];
   }
 

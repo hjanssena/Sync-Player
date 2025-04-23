@@ -57,15 +57,15 @@ class SongListScreen extends StatelessWidget {
           SliverList.builder(
             itemCount: screenState.album.songs.length,
             itemBuilder: (context, index) {
-              return SongItem(song: screenState.album.songs[index]);
+              return SongItem(
+                song: screenState.album.songs[index],
+                currentPlaylistOnScreen: screenState.album,
+              );
             },
           ),
         ],
       ),
-      bottomNavigationBar: SizedBox(
-        height: 100,
-        child: Hero(tag: "playerwidget", child: PlayerWidget()),
-      ),
+      bottomNavigationBar: PlayerWidget(),
     );
   }
 }

@@ -9,8 +9,8 @@ import 'package:sync_player/shared/exit_dialog.dart';
 import 'package:sync_player/shared/loading.dart';
 
 class ListScreenState extends ChangeNotifier {
-  Artist artist = Artist.placeholder();
-  Album album = Album.placeholder();
+  Artist artist = Artist.empty();
+  Album album = Album.empty();
 
   void changeArtist(Artist newArtist) {
     artist = newArtist;
@@ -78,10 +78,7 @@ class ArtistListScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: SizedBox(
-        height: 100,
-        child: Hero(tag: "playerwidget", child: PlayerWidget()),
-      ),
+      bottomNavigationBar: PlayerWidget(),
     );
   }
 }
@@ -119,7 +116,7 @@ class NoDirectoriesScreen extends StatelessWidget {
             SizedBox(height: 50),
             ElevatedButton(
               onPressed: () {
-                library.addPath();
+                library.addSourceDirectory();
               },
               child: Text('Add directory'),
             ),

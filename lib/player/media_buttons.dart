@@ -38,7 +38,6 @@ class NextSongButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PlayerState playerState = context.read<PlayerState>();
     return IconButton(
       iconSize: size,
       onPressed: () {
@@ -58,7 +57,7 @@ class PreviousSongButton extends StatelessWidget {
     final PlayerState playerState = context.read<PlayerState>();
     return Builder(
       builder: (context) {
-        return playerState.isPreviousStackEmpty()
+        return playerState.isSongHistoryEmpty()
             ? IconButton(
               iconSize: size,
               onPressed: null,

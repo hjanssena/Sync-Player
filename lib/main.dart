@@ -73,14 +73,20 @@ class Home extends StatelessWidget {
     var audioStatus = await Permission.audio.status;
 
     if (!audioStatus.isGranted) {
-      await Permission.audio.request();
+      try {
+        await Permission.audio.request();
+      } catch (e) {
+        //not supported by the phone
+      }
     }
 
     var storageStatus = await Permission.storage.status;
     if (!storageStatus.isGranted) {
       try {
         await Permission.storage.request();
-      } catch (e) {}
+      } catch (e) {
+        //Not supported by the phone
+      }
     }
   }
 }

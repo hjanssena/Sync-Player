@@ -9,7 +9,6 @@ class Scraper {
         "Track artist:${song.artistTag} AND Title:${song.title}",
       );
       if (song.albumTag == '') {}
-      print(response["recordings"][0]["title"]);
       return song;
     } catch (e) {
       //Song and artist not found

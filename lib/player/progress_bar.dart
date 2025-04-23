@@ -115,6 +115,6 @@ class LiteProgressBar extends StatelessWidget {
 
     final progress = currentPosition / totalDuration;
 
-    return LinearProgressIndicator(value: progress.clamp(0, 1));
+    return LinearProgressIndicator(value: progress.clamp(0, 1), minHeight: 3);
   }
 }

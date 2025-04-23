@@ -96,7 +96,15 @@ class AlbumItem extends StatelessWidget {
 
 class SongItem extends StatelessWidget {
   final Song song;
-  const SongItem({super.key, required this.song});
+
+  ///List of songs that are currently being displayed on-screen.
+  ///Can be an album, a randomized playlist or an user-made playlist.
+  final PlayList currentPlaylistOnScreen;
+  const SongItem({
+    super.key,
+    required this.song,
+    required this.currentPlaylistOnScreen,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -119,7 +127,12 @@ class SongItem extends StatelessWidget {
                 audioHandler.play();
               }
             } else {
-              player.setSong(song.artist, song.album, song);
+              player.setSongAndPlaylist(
+                song.artist,
+                song.album,
+                song,
+                currentPlaylistOnScreen,
+              );
             }
           },
           child: Container(
@@ -137,12 +150,24 @@ class SongItem extends StatelessWidget {
                 ),
                 SizedBox(width: 10),
                 Expanded(
-                  child: Text(
-                    song.title,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                    overflow: TextOverflow.fade,
-                    softWrap: false,
-                    maxLines: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        song.artist.name,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        overflow: TextOverflow.fade,
+                        softWrap: false,
+                        maxLines: 1,
+                      ),
+                      Text(
+                        song.title,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        overflow: TextOverflow.fade,
+                        softWrap: false,
+                        maxLines: 1,
+                      ),
+                    ],
                   ),
                 ),
                 SizedBox(width: 15),

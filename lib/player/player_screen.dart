@@ -116,11 +116,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     pageSnapping: true,
                     children: [
                       _CarouselSongPage(
-                        song: player.getLastSongInHistory() ?? Song(),
+                        song: player.getLastSongInHistory() ?? Song.empty(),
                       ),
                       _CurrentSongPage(),
                       _CarouselSongPage(
-                        song: player.getNextSongInQueue() ?? Song(),
+                        song: player.getNextSongInQueue() ?? Song.empty(),
                       ),
                     ],
                   ),
@@ -136,7 +136,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 Hero(tag: "FwdBtn", child: NextSongButton(size: 65)),
               ],
             ),
-            Expanded(child: SongProgressBar()),
+            SongProgressBar(),
+            SizedBox(width: 100),
           ],
         ),
       ),
@@ -154,16 +155,16 @@ class _CurrentSongPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         SizedBox(
-          height: 500,
+          height: 300,
           child: Hero(
             tag: "PlayerImg",
             child: Padding(
               padding: const EdgeInsets.all(30),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child:
-                    playerState.currentAlbum?.image ??
-                    Image.asset("assets/placeholder.png"),
+                child: Image.memory(
+                  playerState.currentAlbum?.image ?? fileCache.placeholderImage,
+                ),
               ),
             ),
           ),
@@ -213,14 +214,14 @@ class _CarouselSongPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         SizedBox(
-          height: 500,
+          height: 300,
           child: Hero(
             tag: "PlayerImg",
             child: Padding(
               padding: const EdgeInsets.all(30),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child: song.album.image,
+                child: Image.memory(song.album.image),
               ),
             ),
           ),

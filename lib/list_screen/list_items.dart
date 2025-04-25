@@ -23,7 +23,7 @@ class ArtistItem extends StatelessWidget {
                   tag: "${artist.name}artist",
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(15),
-                    child: artist.image,
+                    child: Image.memory(artist.image),
                   ),
                 ),
               ),
@@ -41,7 +41,7 @@ class ArtistItem extends StatelessWidget {
           ],
         ),
         onTap: () {
-          context.read<ListScreenState>().changeArtist(artist);
+          context.read<LibraryScreenState>().changeArtist(artist);
           Navigator.pushNamed(context, '/albums');
         },
       ),
@@ -66,7 +66,10 @@ class AlbumItem extends StatelessWidget {
                 padding: EdgeInsets.all(5),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: Hero(tag: "${album.name}album", child: album.image),
+                  child: Hero(
+                    tag: "${album.name}album",
+                    child: Image.memory(album.image),
+                  ),
                 ),
               ),
             ),
@@ -86,7 +89,7 @@ class AlbumItem extends StatelessWidget {
           ],
         ),
         onTap: () {
-          context.read<ListScreenState>().changeAlbum(album);
+          context.read<LibraryScreenState>().changeAlbum(album);
           Navigator.pushNamed(context, '/songs');
         },
       ),

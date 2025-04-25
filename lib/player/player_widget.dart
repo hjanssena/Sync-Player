@@ -119,11 +119,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           pageSnapping: true,
                           children: [
                             _CarouselSongInformation(
-                              song: player.getLastSongInHistory() ?? Song(),
+                              song:
+                                  player.getLastSongInHistory() ?? Song.empty(),
                             ),
                             _LiveSongInformation(playerState: playerState),
                             _CarouselSongInformation(
-                              song: player.getNextSongInQueue() ?? Song(),
+                              song: player.getNextSongInQueue() ?? Song.empty(),
                             ),
                           ],
                           onPageChanged: (value) {},
@@ -163,9 +164,10 @@ class _LiveSongInformation extends StatelessWidget {
                 padding: const EdgeInsets.all(5.0),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child:
-                      playerState.currentAlbum?.image ??
-                      Image.asset("assets/placeholder.png"),
+                  child: Image.memory(
+                    playerState.currentAlbum?.image ??
+                        fileCache.placeholderImage,
+                  ),
                 ),
               ),
             ),
@@ -222,7 +224,7 @@ class _CarouselSongInformation extends StatelessWidget {
                 padding: const EdgeInsets.all(5.0),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: song.album.image,
+                  child: Image.memory(song.album.image),
                 ),
               ),
             ),

@@ -8,7 +8,7 @@ import 'package:sync_player/player/player_widget.dart';
 import 'package:sync_player/shared/exit_dialog.dart';
 import 'package:sync_player/shared/loading.dart';
 
-class ListScreenState extends ChangeNotifier {
+class LibraryScreenState extends ChangeNotifier {
   Artist artist = Artist.empty();
   Album album = Album.empty();
 
@@ -31,7 +31,8 @@ class MainScreen extends StatelessWidget {
     var library = context.read<MusicLibrary>();
     return Consumer<MusicLibrary>(
       builder: (context, value, child) {
-        if (library.refreshingList) {
+        if (library.libraryState == LibraryState.loading ||
+            library.libraryState == LibraryState.scanning) {
           return Loader();
         } else if (value.isEmpty()) {
           return NoDirectoriesScreen();

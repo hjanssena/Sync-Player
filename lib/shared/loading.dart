@@ -1,15 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sync_player/Models/music_library.dart';
 
 class Loader extends StatelessWidget {
   const Loader({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final library = context.read<MusicLibrary>();
     return Center(
-      child: const SizedBox(
-        width: 200,
-        height: 200,
-        child: CircularProgressIndicator(),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          SizedBox(width: 150, height: 150, child: CircularProgressIndicator()),
+          SizedBox(height: 75),
+          Text(
+            "Scanning directories. Please wait...",
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+        ],
       ),
     );
   }

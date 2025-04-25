@@ -32,7 +32,7 @@ class PlayerState {
         nextSong();
       }
       if (Platform.isWindows) {
-        audioPlayer.setVolume(.5);
+        audioPlayer.setVolume(.7);
       }
     });
 
@@ -43,7 +43,7 @@ class PlayerState {
     });
 
     // Initialize MediaKit (used on Windows/Linux)
-    JustAudioMediaKit.title = 'My Audio Player App';
+    JustAudioMediaKit.title = 'Sync Player';
     JustAudioMediaKit.ensureInitialized();
   }
 
@@ -52,7 +52,7 @@ class PlayerState {
   final Queue<Song> _songQueue = Queue<Song>();
 
   // Current playback metadata
-  Song currentSong = Song();
+  Song currentSong = Song.empty();
   Album currentAlbum = Album.empty();
   Artist currentArtist = Artist.empty();
   int timeEllapsedMilliseconds = 0;

@@ -1,95 +1,145 @@
-import 'package:flutter/material.dart';
-import 'package:audiotags/audiotags.dart';
+import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:json_annotation/json_annotation.dart';
+import 'package:sync_player/main.dart';
+part 'models.g.dart';
+
+// Convert images to base64
+Uint8List _uint8ListFromBase64(String base64Str) => base64Decode(base64Str);
+String _uint8ListToBase64(Uint8List bytes) => base64Encode(bytes);
+
+@JsonSerializable()
+class Directories {
+  List<String> paths = [];
+
+  Directories({this.paths = const []});
+  factory Directories.fromJson(Map<String, dynamic> json) =>
+      _$DirectoriesFromJson(json);
+  Map<String, dynamic> toJson() => _$DirectoriesToJson(this);
+}
+
+@JsonSerializable()
 class Song {
+  int id;
   String path;
   String title;
-  String artistTag;
-  String albumTag;
+  String albumArtist;
+  String trackArtist;
+  String albumName;
+  String genre;
+  int trackNumber;
   int duration;
   int year;
-  List<Picture> pictures;
   bool scraped;
+  @JsonKey(includeFromJson: false, includeToJson: false)
   Artist artist = Artist.empty();
+  @JsonKey(includeFromJson: false, includeToJson: false)
   Album album = Album.empty();
 
   Song({
-    this.path = '',
-    this.title = '',
-    this.artistTag = '',
-    this.albumTag = '',
-    this.duration = 0,
-    this.year = 0,
-    this.pictures = const [],
-    this.scraped = false,
+    required this.id,
+    required this.path,
+    required this.title,
+    required this.albumArtist,
+    required this.trackArtist,
+    required this.albumName,
+    required this.genre,
+    required this.trackNumber,
+    required this.duration,
+    required this.year,
+    required this.scraped,
   });
 
-  Song? nextInAlbum() {
-    int i = 0;
-
-    while (this != album.songs[i]) {
-      i++;
-    }
-    if (i >= album.songs.length - 1) {
-      return null;
-    } else {
-      return album.songs[i + 1];
-    }
+  static Song empty() {
+    return Song(
+      id: -1 >>> 1,
+      path: '',
+      title: '',
+      albumArtist: '',
+      trackArtist: '',
+      albumName: '',
+      genre: '',
+      trackNumber: 0,
+      duration: 0,
+      year: 0,
+      scraped: false,
+    );
   }
 
-  Song? previousInAlbum() {
-    int i = 0;
-
-    while (this != album.songs[i]) {
-      i++;
-    }
-    if (i >= 1) {
-      return album.songs[i - 1];
-    } else {
-      return null;
-    }
-  }
+  factory Song.fromJson(Map<String, dynamic> json) => _$SongFromJson(json);
+  Map<String, dynamic> toJson() => _$SongToJson(this);
 }
 
+@JsonSerializable()
 class Album extends PlayList {
-  final Image image;
+  @JsonKey(fromJson: _uint8ListFromBase64, toJson: _uint8ListToBase64)
+  Uint8List image;
+  bool scraped;
 
-  Album({required super.name, required super.songs, required this.image});
+  Album({
+    required super.id,
+    required super.name,
+    required super.songs,
+    required this.image,
+    required this.scraped,
+  });
 
-  ///Returns an empty album
   static Album empty() {
     return Album(
+      id: -1 >>> 1,
       name: '',
-      image: Image.asset('assets/placeholder.png'),
-      songs: [],
+      songs: const [],
+      image: fileCache.placeholderImage,
+      scraped: false,
     );
   }
+
+  factory Album.fromJson(Map<String, dynamic> json) => _$AlbumFromJson(json);
+  Map<String, dynamic> toJson() => _$AlbumToJson(this);
 }
 
+@JsonSerializable()
 class PlayList {
-  final String name;
-  final List<Song> songs;
+  int id;
+  String name;
+  List<Song> songs;
 
-  PlayList({required this.name, required this.songs});
+  PlayList({this.id = -1 >>> 1, this.name = '', this.songs = const []});
+
+  factory PlayList.fromJson(Map<String, dynamic> json) =>
+      _$PlayListFromJson(json);
+  Map<String, dynamic> toJson() => _$PlayListToJson(this);
 }
 
+@JsonSerializable()
 class Artist {
-  final String name;
-  Image image;
-  final List<Album> albums;
+  int id;
+  String name;
+  @JsonKey(fromJson: _uint8ListFromBase64, toJson: _uint8ListToBase64)
+  Uint8List image;
+  List<Album> albums;
+  bool scraped;
 
-  Artist({required this.name, required this.image, required this.albums});
+  Artist({
+    required this.id,
+    required this.name,
+    required this.image,
+    required this.albums,
+    required this.scraped,
+  });
 
-  ///Returns an empty artist
   static Artist empty() {
     return Artist(
+      id: -1 >>> 1,
       name: '',
-      image: Image.asset('assets/placeholder.png'),
+      image: fileCache.placeholderImage,
       albums: [],
+      scraped: false,
     );
   }
 
-  ///Returns all the artist's song from all the albums
+  ///Returns all the artist's song from all the albums (Consider moving to controller)
   List<Song> allSongs() {
     List<Song> allSongs = [];
     for (Album album in albums) {
@@ -97,4 +147,7 @@ class Artist {
     }
     return allSongs;
   }
+
+  factory Artist.fromJson(Map<String, dynamic> json) => _$ArtistFromJson(json);
+  Map<String, dynamic> toJson() => _$ArtistToJson(this);
 }

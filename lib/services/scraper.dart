@@ -6,9 +6,9 @@ class Scraper {
     final client = MusicBrainzApiClient();
     try {
       final response = await client.recordings.search(
-        "Track artist:${song.artistTag} AND Title:${song.title}",
+        "Track artist:${song.albumArtist} AND Title:${song.title}",
       );
-      if (song.albumTag == '') {}
+      if (song.albumName == '') {}
       return song;
     } catch (e) {
       //Song and artist not found

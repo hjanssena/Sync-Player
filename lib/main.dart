@@ -8,13 +8,19 @@ import 'package:sync_player/list_screen/main_screen.dart';
 import 'package:sync_player/player/player_state.dart';
 import 'package:sync_player/routes.dart';
 import 'package:sync_player/services/background_audio_handler.dart';
+import 'package:sync_player/services/file_cache.dart';
 
 late final AudioHandler audioHandler;
 late final PlayerState playerState;
+late final FileCache fileCache;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  //Creating references to assets that are used multiple times on the application
+  fileCache = await FileCache.create();
+  //Initialize the player service
   playerState = PlayerState();
+  //Initialize the handler for background playback and notification media control
   audioHandler = await AudioService.init(
     builder: () => BackgroundAudioHandler(player: playerState),
     config: AudioServiceConfig(
@@ -31,10 +37,10 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ///We want to get storage or audio permissions in android depending on the sdk version
+    ///Get storage or audio permissions in android depending on the sdk version
     if (Platform.isAndroid) getPermission();
 
-    ///Later we want to read the cached info to populate the library from here
+    ///Load library if it exists
 
     //Adding all providers we need
     return MultiProvider(
@@ -42,8 +48,8 @@ class Home extends StatelessWidget {
         ChangeNotifierProvider<MusicLibrary>(
           create: (context) => MusicLibrary(),
         ),
-        ChangeNotifierProvider<ListScreenState>(
-          create: (context) => ListScreenState(),
+        ChangeNotifierProvider<LibraryScreenState>(
+          create: (context) => LibraryScreenState(),
         ),
         Provider<PlayerState>(
           create: (_) => playerState,
@@ -65,7 +71,29 @@ class Home extends StatelessWidget {
           ),
         ),
       ],
-      child: MaterialApp(routes: appRoutes, theme: ThemeData.dark()),
+      child: Builder(
+        builder: (context) {
+          //Load library
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            context.read<MusicLibrary>().loadLibrary();
+          });
+          ThemeData theme = ThemeData.dark();
+          return MaterialApp(
+            routes: appRoutes,
+            theme: ThemeData.dark().copyWith(
+              pageTransitionsTheme: const PageTransitionsTheme(
+                builders: {
+                  TargetPlatform.android: ZoomPageTransitionsBuilder(),
+                  TargetPlatform.windows: ZoomPageTransitionsBuilder(),
+                  TargetPlatform.macOS: ZoomPageTransitionsBuilder(),
+                  TargetPlatform.linux: ZoomPageTransitionsBuilder(),
+                  TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                },
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 

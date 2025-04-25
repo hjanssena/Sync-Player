@@ -10,10 +10,11 @@ class AlbumListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ListScreenState screenState = context.read<ListScreenState>();
+    final LibraryScreenState screenState = context.read<LibraryScreenState>();
     final List<Song> allArtistSongs = screenState.artist.allSongs();
     allArtistSongs.shuffle();
     final PlayList randomizedPlayList = PlayList(
+      id: -1 >>> 1,
       name: "Random ${screenState.artist.name}",
       songs: allArtistSongs,
     );
@@ -48,7 +49,7 @@ class AlbumListScreen extends StatelessWidget {
                 tag: "${screenState.artist.name}artist",
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: screenState.artist.image,
+                  child: Image.memory(screenState.artist.image),
                 ),
               ),
             ),

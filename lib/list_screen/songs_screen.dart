@@ -9,7 +9,7 @@ class SongListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ListScreenState screenState = context.read<ListScreenState>();
+    final LibraryScreenState screenState = context.read<LibraryScreenState>();
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
@@ -37,7 +37,7 @@ class SongListScreen extends StatelessWidget {
                 tag: "${screenState.album.name}album",
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: screenState.album.image,
+                  child: Image.memory(screenState.album.image),
                 ),
               ),
             ),

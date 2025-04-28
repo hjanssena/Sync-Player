@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sync_player/Library/library_provider.dart';
 import 'package:sync_player/list_screen/list_items.dart';
-import 'package:sync_player/list_screen/main_screen.dart';
 import 'package:sync_player/player/player_widget.dart';
 
 class SongListScreen extends StatelessWidget {
@@ -9,7 +9,7 @@ class SongListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LibraryScreenState screenState = context.read<LibraryScreenState>();
+    final LibraryProvider library = context.read<LibraryProvider>();
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
@@ -22,7 +22,7 @@ class SongListScreen extends StatelessWidget {
                 children: [
                   SizedBox(height: 15),
                   Text(
-                    screenState.artist.name,
+                    library.selectedArtist.name,
                     style: Theme.of(context).textTheme.headlineMedium,
                     softWrap: false,
                   ),
@@ -34,10 +34,10 @@ class SongListScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(30),
               child: Hero(
-                tag: "${screenState.album.name}album",
+                tag: "${library.selectedAlbum.name}album",
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: Image.memory(screenState.album.image),
+                  child: Image.memory(library.selectedAlbum.image),
                 ),
               ),
             ),
@@ -47,7 +47,7 @@ class SongListScreen extends StatelessWidget {
               padding: const EdgeInsets.all(15),
               child: Center(
                 child: Text(
-                  screenState.album.name,
+                  library.selectedAlbum.name,
                   style: Theme.of(context).textTheme.headlineSmall,
                   textAlign: TextAlign.center,
                 ),
@@ -55,11 +55,11 @@ class SongListScreen extends StatelessWidget {
             ),
           ),
           SliverList.builder(
-            itemCount: screenState.album.songs.length,
+            itemCount: library.selectedAlbum.songs.length,
             itemBuilder: (context, index) {
               return SongItem(
-                song: screenState.album.songs[index],
-                currentPlaylistOnScreen: screenState.album,
+                song: library.selectedAlbum.songs[index],
+                currentPlaylistOnScreen: library.selectedAlbum,
               );
             },
           ),

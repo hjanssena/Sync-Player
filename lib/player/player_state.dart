@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
 import 'package:audio_session/audio_session.dart';
-import 'package:sync_player/Models/models.dart';
+import 'package:sync_player/Library/library_provider.dart';
+import 'package:sync_player/Library/models/models.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:sync_player/Models/music_library.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 
 class PlayerState {
@@ -71,8 +71,8 @@ class PlayerState {
   );
 
   // Music data source
-  MusicLibrary _musicLibrary = MusicLibrary();
-  void setLibrary(MusicLibrary library) => _musicLibrary = library;
+  LibraryProvider _musicLibrary = LibraryProvider();
+  void setLibrary(LibraryProvider library) => _musicLibrary = library;
 
   /// Start/resume playback
   Future<void> resume() async {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sync_player/Models/models.dart';
+import 'package:sync_player/Library/library_provider.dart';
+import 'package:sync_player/Library/models/models.dart';
 import 'package:sync_player/list_screen/list_items.dart';
-import 'package:sync_player/list_screen/main_screen.dart';
 import 'package:sync_player/player/player_widget.dart';
 
 class AlbumListScreen extends StatelessWidget {
@@ -10,12 +10,12 @@ class AlbumListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final LibraryScreenState screenState = context.read<LibraryScreenState>();
-    final List<Song> allArtistSongs = screenState.artist.allSongs();
+    final LibraryProvider library = context.watch<LibraryProvider>();
+    final List<Song> allArtistSongs = library.getArtistSongs();
     allArtistSongs.shuffle();
     final PlayList randomizedPlayList = PlayList(
       id: -1 >>> 1,
-      name: "Random ${screenState.artist.name}",
+      name: "Random ${library.selectedArtist.name}",
       songs: allArtistSongs,
     );
     return Scaffold(
@@ -32,7 +32,7 @@ class AlbumListScreen extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(left: 50, right: 50),
                     child: Text(
-                      screenState.artist.name,
+                      library.selectedArtist.name,
                       style: Theme.of(context).textTheme.headlineMedium,
                       softWrap: false,
                       overflow: TextOverflow.fade,
@@ -46,10 +46,10 @@ class AlbumListScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(30),
               child: Hero(
-                tag: "${screenState.artist.name}artist",
+                tag: "${library.selectedArtist.name}artist",
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: Image.memory(screenState.artist.image),
+                  child: Image.memory(library.selectedArtist.image),
                 ),
               ),
             ),
@@ -72,9 +72,9 @@ class AlbumListScreen extends StatelessWidget {
               mainAxisSpacing: 10,
               childAspectRatio: 1.0,
             ),
-            itemCount: screenState.artist.albums.length,
+            itemCount: library.selectedArtist.albums.length,
             itemBuilder: (BuildContext context, int index) {
-              return AlbumItem(album: screenState.artist.albums[index]);
+              return AlbumItem(album: library.selectedArtist.albums[index]);
             },
           ),
           SliverToBoxAdapter(

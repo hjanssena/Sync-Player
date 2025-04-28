@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:sync_player/Models/music_library.dart';
 
 class Loader extends StatelessWidget {
   const Loader({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final library = context.read<MusicLibrary>();
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
-import 'package:sync_player/Models/models.dart';
+import 'package:sync_player/Library/models/models.dart';
 import 'package:sync_player/main.dart';
 import 'package:sync_player/player/media_buttons.dart';
 import 'package:sync_player/player/player_state.dart';
@@ -66,7 +65,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final PlayerViewState playerState = context.watch<PlayerViewState>();
     final PlayerState player = context.read<PlayerState>();
     return GestureDetector(
       onVerticalDragStart: (details) {

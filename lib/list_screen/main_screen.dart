@@ -1,40 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:sync_player/Models/models.dart';
-import 'package:sync_player/Models/music_library.dart';
+import 'package:sync_player/Library/library_provider.dart';
 import 'package:sync_player/list_screen/list_items.dart';
 import 'package:sync_player/player/player_widget.dart';
 import 'package:sync_player/shared/exit_dialog.dart';
 import 'package:sync_player/shared/loading.dart';
 
-class LibraryScreenState extends ChangeNotifier {
-  Artist artist = Artist.empty();
-  Album album = Album.empty();
-
-  void changeArtist(Artist newArtist) {
-    artist = newArtist;
-    notifyListeners();
-  }
-
-  void changeAlbum(Album newAlbum) {
-    album = newAlbum;
-    notifyListeners();
-  }
-}
-
-class MainScreen extends StatelessWidget {
-  const MainScreen({super.key});
+class EntryScreen extends StatelessWidget {
+  const EntryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var library = context.read<MusicLibrary>();
-    return Consumer<MusicLibrary>(
+    return Consumer<LibraryProvider>(
       builder: (context, value, child) {
-        if (library.libraryState == LibraryState.loading ||
-            library.libraryState == LibraryState.scanning) {
+        if (value.state == LibraryState.loading ||
+            value.state == LibraryState.scanning) {
           return Loader();
-        } else if (value.isEmpty()) {
+        } else if (value.state == LibraryState.empty) {
           return NoDirectoriesScreen();
         } else {
           return ArtistListScreen();
@@ -49,7 +32,7 @@ class ArtistListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final MusicLibrary library = context.read<MusicLibrary>();
+    final LibraryProvider library = context.watch<LibraryProvider>();
     return Scaffold(
       appBar: AppBar(title: Center(child: Text("Music library"))),
       body: PopScope(
@@ -72,9 +55,9 @@ class ArtistListScreen extends StatelessWidget {
               mainAxisSpacing: 10,
               childAspectRatio: 1.0,
             ),
-            itemCount: library.artists.length,
+            itemCount: library.displayedArtists().length,
             itemBuilder: (BuildContext context, int index) {
-              return ArtistItem(artist: library.artists[index]);
+              return ArtistItem(artist: library.displayedArtists()[index]);
             },
           ),
         ),
@@ -90,7 +73,7 @@ class NoDirectoriesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var textTheme = Theme.of(context).textTheme;
-    final MusicLibrary library = context.read<MusicLibrary>();
+    final LibraryProvider library = context.read<LibraryProvider>();
     return Scaffold(
       appBar: AppBar(title: Center(child: Text("No music found"))),
       body: PopScope(
@@ -117,7 +100,7 @@ class NoDirectoriesScreen extends StatelessWidget {
             SizedBox(height: 50),
             ElevatedButton(
               onPressed: () {
-                library.addSourceDirectory();
+                library.addLibraryPath();
               },
               child: Text('Add directory'),
             ),

@@ -1,5 +1,5 @@
 import 'package:musicbrainz_api_client/musicbrainz_api_client.dart';
-import 'package:sync_player/Models/models.dart';
+import 'package:sync_player/Library/models/models.dart';
 
 class Scraper {
   Future<Song> scrapeMissingData(Song song) async {

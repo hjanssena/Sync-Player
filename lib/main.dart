@@ -3,8 +3,7 @@ import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:sync_player/Models/music_library.dart';
-import 'package:sync_player/list_screen/main_screen.dart';
+import 'package:sync_player/Library/library_provider.dart';
 import 'package:sync_player/player/player_state.dart';
 import 'package:sync_player/routes.dart';
 import 'package:sync_player/services/background_audio_handler.dart';
@@ -40,16 +39,11 @@ class Home extends StatelessWidget {
     ///Get storage or audio permissions in android depending on the sdk version
     if (Platform.isAndroid) getPermission();
 
-    ///Load library if it exists
-
     //Adding all providers we need
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<MusicLibrary>(
-          create: (context) => MusicLibrary(),
-        ),
-        ChangeNotifierProvider<LibraryScreenState>(
-          create: (context) => LibraryScreenState(),
+        ChangeNotifierProvider<LibraryProvider>(
+          create: (context) => LibraryProvider(),
         ),
         Provider<PlayerState>(
           create: (_) => playerState,
@@ -58,8 +52,6 @@ class Home extends StatelessWidget {
         StreamProvider<PlayerViewState>(
           create: (context) {
             final playerState = context.read<PlayerState>();
-            final library = context.read<MusicLibrary>();
-            playerState.setLibrary(library);
             return playerState.stateStream;
           },
           initialData: const PlayerViewState(
@@ -75,23 +67,13 @@ class Home extends StatelessWidget {
         builder: (context) {
           //Load library
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<MusicLibrary>().loadLibrary();
+            context.read<LibraryProvider>().init();
           });
-          ThemeData theme = ThemeData.dark();
-          return MaterialApp(
-            routes: appRoutes,
-            theme: ThemeData.dark().copyWith(
-              pageTransitionsTheme: const PageTransitionsTheme(
-                builders: {
-                  TargetPlatform.android: ZoomPageTransitionsBuilder(),
-                  TargetPlatform.windows: ZoomPageTransitionsBuilder(),
-                  TargetPlatform.macOS: ZoomPageTransitionsBuilder(),
-                  TargetPlatform.linux: ZoomPageTransitionsBuilder(),
-                  TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-                },
-              ),
-            ),
+          //Set library reference to player
+          context.read<PlayerState>().setLibrary(
+            context.read<LibraryProvider>(),
           );
+          return MaterialApp(routes: appRoutes, theme: ThemeData.dark());
         },
       ),
     );

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sync_player/list_screen/main_screen.dart';
+import 'package:sync_player/Library/library_provider.dart';
 import 'package:sync_player/main.dart';
 import 'package:sync_player/player/player_state.dart';
-import '../Models/models.dart';
+import '../Library/models/models.dart';
 
 class ArtistItem extends StatelessWidget {
   final Artist artist;
@@ -41,7 +41,7 @@ class ArtistItem extends StatelessWidget {
           ],
         ),
         onTap: () {
-          context.read<LibraryScreenState>().changeArtist(artist);
+          context.read<LibraryProvider>().changeSelectedArtist(artist);
           Navigator.pushNamed(context, '/albums');
         },
       ),
@@ -89,7 +89,7 @@ class AlbumItem extends StatelessWidget {
           ],
         ),
         onTap: () {
-          context.read<LibraryScreenState>().changeAlbum(album);
+          context.read<LibraryProvider>().changeSelectedAlbum(album);
           Navigator.pushNamed(context, '/songs');
         },
       ),

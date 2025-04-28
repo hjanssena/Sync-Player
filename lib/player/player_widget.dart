@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sync_player/Models/models.dart';
+import 'package:sync_player/Library/models/models.dart';
 import 'package:sync_player/main.dart';
 import 'package:sync_player/player/media_buttons.dart';
 import 'package:sync_player/player/player_state.dart';

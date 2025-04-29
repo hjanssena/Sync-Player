@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/main.dart';
-import 'package:sync_player/player/player_state.dart';
+import 'package:sync_player/player/player.dart';
+import 'package:sync_player/player/player_provider.dart';
 
 class PlayPauseButton extends StatelessWidget {
   final double size;
@@ -9,21 +10,21 @@ class PlayPauseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PlayerState playerState = context.read<PlayerState>();
+    final PlayerProvider playerProvider = context.read<PlayerProvider>();
     return Builder(
       builder: (context) {
-        return playerState.playing
+        return playerProvider.player.state == PlayerSt.playing
             ? IconButton(
               iconSize: size,
               onPressed: () {
-                audioHandler.pause();
+                playerProvider.pause();
               },
               icon: Icon(Icons.pause_circle),
             )
             : IconButton(
               iconSize: size,
               onPressed: () {
-                audioHandler.play();
+                playerProvider.resume();
               },
               icon: Icon(Icons.play_circle),
             );
@@ -41,7 +42,7 @@ class NextSongButton extends StatelessWidget {
     return IconButton(
       iconSize: size,
       onPressed: () {
-        audioHandler.skipToNext();
+        playerProvider.nextSong();
       },
       icon: Icon(Icons.arrow_circle_right_outlined),
     );
@@ -54,10 +55,10 @@ class PreviousSongButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PlayerState playerState = context.read<PlayerState>();
+    final PlayerProvider playerProvider = context.read<PlayerProvider>();
     return Builder(
       builder: (context) {
-        return playerState.isSongHistoryEmpty()
+        return playerProvider.isSongHistoryEmpty()
             ? IconButton(
               iconSize: size,
               onPressed: null,
@@ -66,7 +67,7 @@ class PreviousSongButton extends StatelessWidget {
             : IconButton(
               iconSize: size,
               onPressed: () {
-                audioHandler.skipToPrevious();
+                playerProvider.previousSong();
               },
               icon: Icon(Icons.arrow_circle_left_outlined),
             );

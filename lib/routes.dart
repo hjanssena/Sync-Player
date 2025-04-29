@@ -1,7 +1,7 @@
-import 'package:sync_player/list_screen/albums_screen.dart';
-import 'package:sync_player/list_screen/main_screen.dart';
-import 'package:sync_player/list_screen/songs_screen.dart';
-import 'package:sync_player/player/player_screen.dart';
+import 'package:sync_player/views/library/albums_screen.dart';
+import 'package:sync_player/views/library/main_screen.dart';
+import 'package:sync_player/views/library/songs_screen.dart';
+import 'package:sync_player/views/Player/player_screen.dart';
 
 var appRoutes = {
   '/': (context) => const EntryScreen(),

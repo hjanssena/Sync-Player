@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/library_provider.dart';
-import 'package:sync_player/list_screen/list_items.dart';
-import 'package:sync_player/player/player_widget.dart';
-import 'package:sync_player/shared/exit_dialog.dart';
-import 'package:sync_player/shared/loading.dart';
+import 'package:sync_player/views/Player/player_widget.dart';
+import 'package:sync_player/views/library/list_items.dart';
+import 'package:sync_player/views/shared/exit_dialog.dart';
+import 'package:sync_player/views/shared/loading.dart';
 
 class EntryScreen extends StatelessWidget {
   const EntryScreen({super.key});

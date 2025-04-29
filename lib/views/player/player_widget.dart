@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/models/models.dart';
 import 'package:sync_player/main.dart';
-import 'package:sync_player/player/media_buttons.dart';
-import 'package:sync_player/player/player_state.dart';
-import 'package:sync_player/player/progress_bar.dart';
+import 'package:sync_player/views/Player/components/media_buttons.dart';
+import 'package:sync_player/player/player_provider.dart';
+import 'package:sync_player/views/Player/components/progress_bar.dart';
 
 class PlayerWidget extends StatefulWidget {
   const PlayerWidget({super.key});
@@ -64,8 +64,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final playerState = context.watch<PlayerViewState>();
-    final player = context.read<PlayerState>();
+    final playerProvider = context.watch<PlayerProvider>();
     //double endSwipePosition;
 
     return Container(
@@ -98,12 +97,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                         if (!changingSong) {
                           if (details.globalPosition.dx >
                               startSwipePositionX + 10) {
-                            if (!player.isSongHistoryEmpty()) {
+                            if (!playerProvider.isSongHistoryEmpty()) {
                               _handlePageChange(0);
                             }
                           } else if (details.globalPosition.dx <
                               startSwipePositionX - 10) {
-                            if (!player.isSongQueueEmpty()) {
+                            if (!playerProvider.isSongQueueEmpty()) {
                               _handlePageChange(2);
                             }
                           }
@@ -120,11 +119,16 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           children: [
                             _CarouselSongInformation(
                               song:
-                                  player.getLastSongInHistory() ?? Song.empty(),
+                                  playerProvider.getLastSongInHistory() ??
+                                  Song.empty(),
                             ),
-                            _LiveSongInformation(playerState: playerState),
+                            _LiveSongInformation(
+                              playerProvider: playerProvider,
+                            ),
                             _CarouselSongInformation(
-                              song: player.getNextSongInQueue() ?? Song.empty(),
+                              song:
+                                  playerProvider.getNextSongInQueue() ??
+                                  Song.empty(),
                             ),
                           ],
                           onPageChanged: (value) {},
@@ -145,9 +149,9 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 }
 
 class _LiveSongInformation extends StatelessWidget {
-  const _LiveSongInformation({super.key, required this.playerState});
+  const _LiveSongInformation({super.key, required this.playerProvider});
 
-  final PlayerViewState playerState;
+  final PlayerProvider playerProvider;
 
   @override
   Widget build(BuildContext context) {
@@ -164,10 +168,7 @@ class _LiveSongInformation extends StatelessWidget {
                 padding: const EdgeInsets.all(5.0),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: Image.memory(
-                    playerState.currentAlbum?.image ??
-                        fileCache.placeholderImage,
-                  ),
+                  child: Image.memory(playerProvider.currentSong.album.image),
                 ),
               ),
             ),
@@ -181,7 +182,7 @@ class _LiveSongInformation extends StatelessWidget {
                 Hero(
                   tag: "ArtistInfo",
                   child: Text(
-                    playerState.currentArtist?.name ?? "No artist",
+                    playerProvider.currentSong.artist.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyMedium,
@@ -190,7 +191,7 @@ class _LiveSongInformation extends StatelessWidget {
                 Hero(
                   tag: "SongInfo",
                   child: Text(
-                    playerState.currentSong?.title ?? "No song",
+                    playerProvider.currentSong.title,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.bodyLarge,
@@ -267,7 +268,7 @@ class _MediaButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    context.watch<PlayerViewState>();
+    context.watch<PlayerProvider>();
     return Container(
       color: const Color.fromARGB(255, 26, 25, 25),
       child: Builder(

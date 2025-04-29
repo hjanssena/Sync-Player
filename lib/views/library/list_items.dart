@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/library_provider.dart';
-import 'package:sync_player/main.dart';
-import 'package:sync_player/player/player_state.dart';
-import '../Library/models/models.dart';
+import 'package:sync_player/Library/models/models.dart';
+import 'package:sync_player/player/player.dart';
+import 'package:sync_player/player/player_provider.dart';
 
 class ArtistItem extends StatelessWidget {
   final Artist artist;
@@ -111,31 +111,25 @@ class SongItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PlayerState player = context.read<PlayerState>();
-    PlayerViewState playerState = context.watch<PlayerViewState>();
+    PlayerProvider playerProvider = context.watch<PlayerProvider>();
     return Material(
       child: Card(
         elevation: 0,
         color:
-            playerState.currentSong == song
+            playerProvider.currentSong == song
                 ? ThemeData.dark().focusColor
                 : ThemeData.dark().cardColor,
         child: InkWell(
           onHover: (value) {},
           onTap: () {
-            if (playerState.currentSong == song) {
-              if (playerState.playing) {
-                audioHandler.stop();
+            if (playerProvider.currentSong == song) {
+              if (playerProvider.player.state == PlayerSt.playing) {
+                playerProvider.stop();
               } else {
-                audioHandler.play();
+                playerProvider.resume();
               }
             } else {
-              player.setSongAndPlaylist(
-                song.artist,
-                song.album,
-                song,
-                currentPlaylistOnScreen,
-              );
+              playerProvider.setSongAndPlaylist(song, currentPlaylistOnScreen);
             }
           },
           child: Container(
@@ -145,8 +139,8 @@ class SongItem extends StatelessWidget {
               children: [
                 Builder(
                   builder: (context) {
-                    return playerState.currentSong == song &&
-                            playerState.playing
+                    return playerProvider.currentSong == song &&
+                            playerProvider.player.state == PlayerSt.playing
                         ? Icon(Icons.pause)
                         : Icon(Icons.play_arrow);
                   },

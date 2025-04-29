@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/models/models.dart';
 import 'package:sync_player/main.dart';
-import 'package:sync_player/player/media_buttons.dart';
-import 'package:sync_player/player/player_state.dart';
-import 'package:sync_player/player/progress_bar.dart';
+import 'package:sync_player/views/Player/components/media_buttons.dart';
+import 'package:sync_player/player/player_provider.dart';
+import 'package:sync_player/views/Player/components/progress_bar.dart';
 
 class PlayerScreen extends StatefulWidget {
   const PlayerScreen({super.key});
@@ -65,7 +65,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final PlayerState player = context.read<PlayerState>();
+    final PlayerProvider playerProvider = context.watch<PlayerProvider>();
     return GestureDetector(
       onVerticalDragStart: (details) {
         startSwipePositionY = details.globalPosition.dy;
@@ -93,12 +93,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                 onHorizontalDragEnd: (details) {
                   if (!changingSong) {
                     if (details.globalPosition.dx > startSwipePositionX + 10) {
-                      if (!player.isSongHistoryEmpty()) {
+                      if (!playerProvider.isSongHistoryEmpty()) {
                         _handlePageChange(0);
                       }
                     } else if (details.globalPosition.dx <
                         startSwipePositionX - 10) {
-                      if (!player.isSongQueueEmpty()) {
+                      if (!playerProvider.isSongQueueEmpty()) {
                         _handlePageChange(2);
                       }
                     }
@@ -114,11 +114,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
                     pageSnapping: true,
                     children: [
                       _CarouselSongPage(
-                        song: player.getLastSongInHistory() ?? Song.empty(),
+                        song:
+                            playerProvider.getLastSongInHistory() ??
+                            Song.empty(),
                       ),
                       _CurrentSongPage(),
                       _CarouselSongPage(
-                        song: player.getNextSongInQueue() ?? Song.empty(),
+                        song:
+                            playerProvider.getNextSongInQueue() ?? Song.empty(),
                       ),
                     ],
                   ),
@@ -148,7 +151,7 @@ class _CurrentSongPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    PlayerViewState playerState = context.watch<PlayerViewState>();
+    PlayerProvider playerProvider = context.watch<PlayerProvider>();
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -160,9 +163,7 @@ class _CurrentSongPage extends StatelessWidget {
               padding: const EdgeInsets.all(30),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child: Image.memory(
-                  playerState.currentAlbum?.image ?? fileCache.placeholderImage,
-                ),
+                child: Image.memory(playerProvider.currentSong.album.image),
               ),
             ),
           ),
@@ -173,7 +174,7 @@ class _CurrentSongPage extends StatelessWidget {
             child: Hero(
               tag: "ArtistInfo",
               child: Text(
-                playerState.currentArtist?.name ?? "No artist",
+                playerProvider.currentSong.artist.name,
                 maxLines: 1,
                 overflow: TextOverflow.fade,
                 softWrap: false,
@@ -188,7 +189,7 @@ class _CurrentSongPage extends StatelessWidget {
             child: Hero(
               tag: "SongInfo",
               child: Text(
-                playerState.currentSong?.title ?? "No song",
+                playerProvider.currentSong.title,
                 maxLines: 1,
                 overflow: TextOverflow.fade,
                 softWrap: false,

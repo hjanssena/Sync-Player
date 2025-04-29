@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sync_player/player/player_state.dart';
+import 'package:sync_player/player/player.dart';
+import 'package:sync_player/player/player_provider.dart';
 
 class SongProgressBar extends StatefulWidget {
   const SongProgressBar({super.key});
@@ -23,11 +24,10 @@ class _SongProgressBarState extends State<SongProgressBar> {
 
   @override
   Widget build(BuildContext context) {
-    final viewState = context.watch<PlayerViewState>();
-    final player = context.read<PlayerState>();
+    final playerProvider = context.watch<PlayerProvider>();
 
-    var totalDuration = viewState.currentSong?.duration ?? 1;
-    final currentPosition = viewState.timeEllapsedMilliseconds;
+    var totalDuration = playerProvider.currentSong?.duration ?? 1;
+    final currentPosition = playerProvider.player.timeEllapsedMilliseconds;
     totalDuration = totalDuration * 1000;
 
     final progress = currentPosition / totalDuration;
@@ -47,12 +47,13 @@ class _SongProgressBarState extends State<SongProgressBar> {
               setState(() {
                 _isDragging = true;
                 _dragValue = value;
-                _wasPlayingBeforeDrag = viewState.playing;
+                _wasPlayingBeforeDrag =
+                    playerProvider.player.state == PlayerSt.playing;
               });
 
               // Auto pause
               if (_wasPlayingBeforeDrag) {
-                player.pause();
+                playerProvider.pause();
               }
             },
             onChanged: (value) {
@@ -62,11 +63,11 @@ class _SongProgressBarState extends State<SongProgressBar> {
             },
             onChangeEnd: (value) {
               final newPosition = (value * totalDuration).toInt();
-              player.seek(Duration(milliseconds: newPosition));
+              playerProvider.seek(Duration(milliseconds: newPosition));
 
               // Resume if it was playing before
               if (_wasPlayingBeforeDrag) {
-                player.resume();
+                playerProvider.resume();
               }
 
               setState(() {
@@ -107,10 +108,10 @@ class LiteProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewState = context.watch<PlayerViewState>();
+    final viewState = context.watch<PlayerProvider>();
 
     var totalDuration = viewState.currentSong?.duration ?? 1;
-    final currentPosition = viewState.timeEllapsedMilliseconds;
+    final currentPosition = viewState.player.timeEllapsedMilliseconds;
     totalDuration = totalDuration * 1000;
 
     final progress = currentPosition / totalDuration;

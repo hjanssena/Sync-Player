@@ -4,24 +4,27 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/library_provider.dart';
-import 'package:sync_player/player/player_state.dart';
+import 'package:sync_player/player/player_provider.dart';
 import 'package:sync_player/routes.dart';
 import 'package:sync_player/services/background_audio_handler.dart';
 import 'package:sync_player/services/file_cache.dart';
 
-late final AudioHandler audioHandler;
-late final PlayerState playerState;
 late final FileCache fileCache;
+late final AudioHandler audioHandler;
+late final PlayerProvider playerProvider;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Creating references to assets that are used multiple times on the application
   fileCache = await FileCache.create();
   //Initialize the player service
-  playerState = PlayerState();
+  playerProvider = PlayerProvider();
   //Initialize the handler for background playback and notification media control
   audioHandler = await AudioService.init(
-    builder: () => BackgroundAudioHandler(player: playerState),
+    builder:
+        () =>
+            BackgroundAudioHandler(playerProvider: playerProvider)
+                as AudioHandler,
     config: AudioServiceConfig(
       androidNotificationChannelId: 'com.example.sync_player.channel.audio',
       androidNotificationChannelName: 'Music playback',
@@ -45,34 +48,17 @@ class Home extends StatelessWidget {
         ChangeNotifierProvider<LibraryProvider>(
           create: (context) => LibraryProvider(),
         ),
-        Provider<PlayerState>(
-          create: (_) => playerState,
-          dispose: (_, playerState) => playerState.dispose(),
-        ),
-        StreamProvider<PlayerViewState>(
-          create: (context) {
-            final playerState = context.read<PlayerState>();
-            return playerState.stateStream;
-          },
-          initialData: const PlayerViewState(
-            currentSong: null,
-            currentAlbum: null,
-            currentArtist: null,
-            timeEllapsedMilliseconds: 0,
-            playing: false,
-          ),
-        ),
+        ChangeNotifierProvider<PlayerProvider>(create: (_) => playerProvider),
       ],
       child: Builder(
         builder: (context) {
           //Load library
+          LibraryProvider library = context.read<LibraryProvider>();
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.read<LibraryProvider>().init();
+            library.init();
           });
           //Set library reference to player
-          context.read<PlayerState>().setLibrary(
-            context.read<LibraryProvider>(),
-          );
+          context.read<PlayerProvider>().setLibrary(library);
           return MaterialApp(routes: appRoutes, theme: ThemeData.dark());
         },
       ),

@@ -147,8 +147,6 @@ class _PlayerScreenState extends State<PlayerScreen> {
 }
 
 class _CurrentSongPage extends StatelessWidget {
-  const _CurrentSongPage({super.key});
-
   @override
   Widget build(BuildContext context) {
     PlayerProvider playerProvider = context.watch<PlayerProvider>();
@@ -205,7 +203,7 @@ class _CurrentSongPage extends StatelessWidget {
 
 class _CarouselSongPage extends StatelessWidget {
   final Song song;
-  const _CarouselSongPage({super.key, required this.song});
+  const _CarouselSongPage({required this.song});
 
   @override
   Widget build(BuildContext context) {

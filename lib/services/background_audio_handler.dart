@@ -29,11 +29,11 @@ class BackgroundAudioHandler extends BaseAudioHandler with QueueHandler {
       );
 
       // Start a periodic timer to update progress
-      _positionUpdateTimer = Timer.periodic(Duration(milliseconds: 500), (_) {
-        if (playerProvider.player.state == PlayerSt.playing) {
-          _broadcastState(playerProvider.player.audioPlayer.playbackEvent);
-        }
-      });
+      // _positionUpdateTimer = Timer.periodic(Duration(milliseconds: 500), (_) {
+      //   if (playerProvider.player.state == PlayerSt.playing) {
+      //     _broadcastState(playerProvider.player.audioPlayer.playbackEvent);
+      //   }
+      // });
     });
   }
 
@@ -53,17 +53,17 @@ class BackgroundAudioHandler extends BaseAudioHandler with QueueHandler {
           MediaAction.seekForward,
           MediaAction.seekBackward,
         },
-        processingState:
-            {
-              ProcessingState.idle: AudioProcessingState.idle,
-              ProcessingState.loading: AudioProcessingState.loading,
-              ProcessingState.buffering: AudioProcessingState.buffering,
-              ProcessingState.ready: AudioProcessingState.ready,
-              ProcessingState.completed: AudioProcessingState.completed,
-            }[playerProvider.player.audioPlayer.processingState]!,
+        // processingState:
+        //     {
+        //       ProcessingState.idle: AudioProcessingState.idle,
+        //       ProcessingState.loading: AudioProcessingState.loading,
+        //       ProcessingState.buffering: AudioProcessingState.buffering,
+        //       ProcessingState.ready: AudioProcessingState.ready,
+        //       ProcessingState.completed: AudioProcessingState.completed,
+        //     }[playerProvider.player.audioPlayer.processingState]!,
         playing: playerProvider.player.state == PlayerSt.playing,
         updatePosition: playerProvider.player.audioPlayer.position,
-        bufferedPosition: playerProvider.player.audioPlayer.bufferedPosition,
+        // bufferedPosition: playerProvider.player.audioPlayer.bufferedPosition,
         speed: playerProvider.player.audioPlayer.speed,
         queueIndex: null,
       ),

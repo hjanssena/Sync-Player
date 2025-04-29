@@ -10,7 +10,7 @@ class PlayPauseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PlayerProvider playerProvider = context.read<PlayerProvider>();
+    final PlayerProvider playerProvider = context.watch<PlayerProvider>();
     return Builder(
       builder: (context) {
         return playerProvider.player.state == PlayerSt.playing

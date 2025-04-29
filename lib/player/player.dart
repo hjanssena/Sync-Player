@@ -49,22 +49,22 @@ class Player {
 
   Future<void> resume() async {
     if (audioPlayer.audioSource != null) {
-      await audioPlayer.play();
       state = PlayerSt.playing;
+      audioPlayer.play();
     }
   }
 
   Future<void> pause() async {
     if (audioPlayer.audioSource != null) {
-      await audioPlayer.pause();
       state = PlayerSt.paused;
+      await audioPlayer.pause();
     }
   }
 
   Future<void> stop() async {
     if (audioPlayer.audioSource != null) {
-      await audioPlayer.stop();
       state = PlayerSt.idle;
+      await audioPlayer.stop();
     }
   }
 
@@ -72,11 +72,11 @@ class Player {
     await audioPlayer.seek(position);
   }
 
-  Future<void> changeSong(Song song) async {
+  Future<void> changeSongAndPlay(Song song) async {
     state = PlayerSt.changingAudio;
     await stop();
     await audioPlayer.setAudioSource(AudioSource.file(song.path));
-    state = PlayerSt.paused;
+    await resume();
   }
 
   /// Dispose resources

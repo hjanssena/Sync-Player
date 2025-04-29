@@ -26,7 +26,7 @@ class _SongProgressBarState extends State<SongProgressBar> {
   Widget build(BuildContext context) {
     final playerProvider = context.watch<PlayerProvider>();
 
-    var totalDuration = playerProvider.currentSong?.duration ?? 1;
+    var totalDuration = playerProvider.currentSong.duration;
     final currentPosition = playerProvider.player.timeEllapsedMilliseconds;
     totalDuration = totalDuration * 1000;
 
@@ -110,7 +110,7 @@ class LiteProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewState = context.watch<PlayerProvider>();
 
-    var totalDuration = viewState.currentSong?.duration ?? 1;
+    var totalDuration = viewState.currentSong.duration;
     final currentPosition = viewState.player.timeEllapsedMilliseconds;
     totalDuration = totalDuration * 1000;
 

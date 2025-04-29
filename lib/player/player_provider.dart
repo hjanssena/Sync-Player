@@ -50,9 +50,11 @@ class PlayerProvider extends ChangeNotifier {
   Future<void> resume() async {
     if (currentSong.id == -1 >>> 1) {
       currentSong = _musicLibrary.getRandomSong();
-      await player.changeSong(currentSong);
+      await player.changeSongAndPlay(currentSong);
+    } else {
+      await player.resume();
     }
-    await player.resume();
+
     _broadcast();
   }
 
@@ -79,14 +81,14 @@ class PlayerProvider extends ChangeNotifier {
     await player.stop();
     if (currentSong.id != -1 >>> 1) _addSongToHistory(currentSong);
     currentSong = song;
-    await player.changeSong(currentSong);
+    await player.changeSongAndPlay(currentSong);
     _songQueue.clear();
     _fillQueueWithPlaylist(playlist);
     _fillQueue();
     resume();
   }
 
-  /// Play the next song in the queue
+  /// Play the next song in the queue and re-fills the queue
   Future<void> nextSong() async {
     if (currentSong.id != -1 >>> 1) {
       _addSongToHistory(currentSong);
@@ -98,8 +100,9 @@ class PlayerProvider extends ChangeNotifier {
       currentSong = _musicLibrary.getRandomSong();
     }
 
-    await player.changeSong(currentSong);
+    await player.changeSongAndPlay(currentSong);
     await resume();
+    _fillQueue();
   }
 
   /// Play the previous song from history
@@ -107,7 +110,7 @@ class PlayerProvider extends ChangeNotifier {
     if (_previousSongs.isNotEmpty) {
       _songQueue.addFirst(currentSong);
       currentSong = _previousSongs.removeLast();
-      await player.changeSong(currentSong);
+      await player.changeSongAndPlay(currentSong);
       await resume();
     }
   }

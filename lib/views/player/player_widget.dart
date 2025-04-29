@@ -149,7 +149,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
 }
 
 class _LiveSongInformation extends StatelessWidget {
-  const _LiveSongInformation({super.key, required this.playerProvider});
+  const _LiveSongInformation({required this.playerProvider});
 
   final PlayerProvider playerProvider;
 
@@ -208,7 +208,7 @@ class _LiveSongInformation extends StatelessWidget {
 
 class _CarouselSongInformation extends StatelessWidget {
   final Song song;
-  const _CarouselSongInformation({super.key, required this.song});
+  const _CarouselSongInformation({required this.song});
 
   @override
   Widget build(BuildContext context) {
@@ -264,7 +264,7 @@ class _CarouselSongInformation extends StatelessWidget {
 }
 
 class _MediaButtons extends StatelessWidget {
-  const _MediaButtons({super.key});
+  const _MediaButtons();
 
   @override
   Widget build(BuildContext context) {

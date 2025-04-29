@@ -21,10 +21,10 @@ packages:
     dependency: transitive
     description:
       name: archive
-      sha256: a7f37ff061d7abc2fcf213554b9dcaca713c5853afa5c065c44888bc9ccaf813
+      sha256: "2fde1607386ab523f7a36bb3e7edb43bd58e6edaf2ffb29d8a6d578b297fdbbd"
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.6"
+    version: "4.0.7"
   args:
     dependency: transitive
     description:
@@ -45,10 +45,10 @@ packages:
     dependency: "direct main"
     description:
       name: audio_metadata_reader
-      sha256: a0e0d660fce5f361df3811a94082887a623e4d4359d987397c61aa77173950c6
+      sha256: "402b314c7212d04ecc425325d2145a0e406c50cb4c80150972ba2fb447e78688"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.2"
+    version: "1.4.0"
   audio_service:
     dependency: "direct main"
     description:
@@ -330,10 +330,10 @@ packages:
     dependency: transitive
     description:
       name: flutter_plugin_android_lifecycle
-      sha256: "5a1e6fb2c0561958d7e4c33574674bda7b77caaca7a33b758876956f2902eea3"
+      sha256: f948e346c12f8d5480d2825e03de228d0eb8c3a737e4cdaa122267b89c022b5e
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.27"
+    version: "2.0.28"
   flutter_rust_bridge:
     dependency: transitive
     description:
@@ -460,10 +460,10 @@ packages:
     dependency: "direct main"
     description:
       name: just_audio
-      sha256: "451d7995b122da6c22fadf0e430280aaf2ad629f77ea7e82c39987b99e8bc7a2"
+      sha256: "369100a808395fc863d304cce97b920efcca71157b9705b0b3d21d415af344fd"
       url: "https://pub.dev"
     source: hosted
-    version: "0.10.0"
+    version: "0.10.1"
   just_audio_media_kit:
     dependency: "direct main"
     description:
@@ -580,10 +580,10 @@ packages:
     dependency: "direct main"
     description:
       name: musicbrainz_api_client
-      sha256: b89d6f5a3c9bd79ccb77db69954fe932c11395e7c8c4d00c49ebc590c5118d95
+      sha256: "05d94ed5e1dab7a35b48ab15d02de5ad042f092d00e12a0208cfa18ffb37fc04"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.7"
+    version: "0.1.8"
   nested:
     dependency: transitive
     description:
@@ -620,10 +620,10 @@ packages:
     dependency: transitive
     description:
       name: path_provider_android
-      sha256: "0ca7359dad67fd7063cb2892ab0c0737b2daafd807cf1acecd62374c8fae6c12"
+      sha256: d0d310befe2c8ab9e7f393288ccbb11b60c019c6b5afc21973eeee4dda2b35e9
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.16"
+    version: "2.2.17"
   path_provider_foundation:
     dependency: transitive
     description:

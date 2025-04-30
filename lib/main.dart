@@ -27,7 +27,7 @@ Future<void> main() async {
                 as AudioHandler,
     config: AudioServiceConfig(
       androidNotificationChannelId: 'com.example.sync_player.channel.audio',
-      androidNotificationChannelName: 'Music playback',
+      androidNotificationChannelName: 'Sync Player',
       androidNotificationOngoing: true,
     ),
   );

@@ -123,7 +123,7 @@ class SongItem extends StatelessWidget {
           onHover: (value) {},
           onTap: () {
             if (playerProvider.currentSong == song) {
-              if (playerProvider.player.state == PlayerSt.playing) {
+              if (playerProvider.getPlayerState() == PlayerSt.playing) {
                 playerProvider.stop();
               } else {
                 playerProvider.resume();
@@ -140,7 +140,7 @@ class SongItem extends StatelessWidget {
                 Builder(
                   builder: (context) {
                     return playerProvider.currentSong == song &&
-                            playerProvider.player.state == PlayerSt.playing
+                            playerProvider.getPlayerState() == PlayerSt.playing
                         ? Icon(Icons.pause)
                         : Icon(Icons.play_arrow);
                   },

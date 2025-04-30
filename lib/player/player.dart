@@ -1,86 +1,132 @@
+import 'dart:async';
 import 'dart:io';
 
-import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_media_kit/just_audio_media_kit.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:sync_player/Library/models/models.dart';
 
+/// Enum representing player state
 enum PlayerSt { idle, playing, changingAudio, paused, completed }
 
+/// Singleton player class that manages audio playback using just_audio.
 class Player {
   // Singleton instance
   static final Player _instance = Player._internal();
   factory Player() => _instance;
 
-  // Constructor (private for singleton)
+  // Private constructor
   Player._internal() {
     _init();
   }
 
-  // Audio player from just_audio
+  // Audio player instance
   final AudioPlayer audioPlayer = AudioPlayer();
 
   // Player state
   PlayerSt state = PlayerSt.idle;
-  Song currentSong = Song.empty();
+
+  // Time elapsed in milliseconds
   int timeEllapsedMilliseconds = 0;
 
-  /// Initialization: configure audio session and listen to events
+  // Stream controller for broadcasting player state changes
+  final StreamController<PlayerSt> _stateStreamController =
+      StreamController<PlayerSt>.broadcast();
+
+  // Public state stream
+  Stream<PlayerSt> get stateStream => _stateStreamController.stream;
+
+  /// Initialization: setup media session, platform-specific config, and listeners
   Future<void> _init() async {
-    // Handle end of song playback
-    audioPlayer.playerStateStream.listen((justAudioState) {
-      if (justAudioState.processingState == ProcessingState.completed) {
-        state = PlayerSt.completed;
-      }
+    audioPlayer.onPlayerComplete.listen((justAudioState) {
+      _setState(PlayerSt.completed); // Broadcast completion
     });
 
-    // Update playback progress
-    audioPlayer.positionStream.listen((position) {
+    // Track playback position
+    audioPlayer.onPositionChanged.listen((position) {
       timeEllapsedMilliseconds = position.inMilliseconds;
     });
 
-    // Initialize MediaKit (used on Windows/Linux)
-    JustAudioMediaKit.title = 'Sync Player';
-    JustAudioMediaKit.ensureInitialized();
-
+    // Default volume on Windows
     if (Platform.isWindows) {
-      audioPlayer.setVolume(.7);
+      audioPlayer.setVolume(0.7);
     }
   }
 
+  /// Helper to update player state and notify listeners
+  void _setState(PlayerSt newState) {
+    state = newState;
+    _stateStreamController.add(state);
+  }
+
+  /// Resume playback if an audio source is loaded
   Future<void> resume() async {
-    if (audioPlayer.audioSource != null) {
-      state = PlayerSt.playing;
-      audioPlayer.play();
+    try {
+      if (audioPlayer.source != null) {
+        _setState(PlayerSt.playing);
+        await audioPlayer.resume();
+      }
+    } catch (e) {
+      _setState(PlayerSt.idle);
+      print('Error resuming playback: $e');
     }
   }
 
+  /// Pause playback
   Future<void> pause() async {
-    if (audioPlayer.audioSource != null) {
-      state = PlayerSt.paused;
-      await audioPlayer.pause();
+    try {
+      if (audioPlayer.source != null) {
+        _setState(PlayerSt.paused);
+        await audioPlayer.pause();
+      }
+    } catch (e) {
+      print('Error pausing playback: $e');
     }
   }
 
+  /// Stop playback
   Future<void> stop() async {
-    if (audioPlayer.audioSource != null) {
-      state = PlayerSt.idle;
-      await audioPlayer.stop();
+    try {
+      if (audioPlayer.source != null) {
+        _setState(PlayerSt.idle);
+        await audioPlayer.stop();
+      }
+    } catch (e) {
+      print('Error stopping playback: $e');
     }
   }
 
+  /// Seek to a specific position in the current track
   Future<void> seek(Duration position) async {
-    await audioPlayer.seek(position);
+    try {
+      await audioPlayer.seek(position);
+    } catch (e) {
+      print('Error seeking: $e');
+    }
   }
 
+  /// Load a new song and start playback
   Future<void> changeSongAndPlay(Song song) async {
-    state = PlayerSt.changingAudio;
-    await stop();
-    await audioPlayer.setAudioSource(AudioSource.file(song.path));
-    await resume();
+    try {
+      await audioPlayer.setSource(DeviceFileSource(song.path));
+      await resume();
+    } catch (e) {
+      _setState(PlayerSt.idle);
+      print('Error changing song: $e');
+    }
   }
 
-  /// Dispose resources
+  /// Set the playback volume (0.0 to 1.0)
+  Future<void> setVolume(double volume) async {
+    try {
+      await audioPlayer.setVolume(volume.clamp(0.0, 1.0));
+    } catch (e) {
+      print('Error setting volume: $e');
+    }
+  }
+
+  /// Clean up audio player and stream controller
   void dispose() {
+    audioPlayer.release();
     audioPlayer.dispose();
+    _stateStreamController.close();
   }
 }

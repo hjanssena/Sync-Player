@@ -13,7 +13,7 @@ class PlayPauseButton extends StatelessWidget {
     final PlayerProvider playerProvider = context.watch<PlayerProvider>();
     return Builder(
       builder: (context) {
-        return playerProvider.player.state == PlayerSt.playing
+        return playerProvider.getPlayerState() == PlayerSt.playing
             ? IconButton(
               iconSize: size,
               onPressed: () {
@@ -55,7 +55,7 @@ class PreviousSongButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final PlayerProvider playerProvider = context.read<PlayerProvider>();
+    final PlayerProvider playerProvider = context.watch<PlayerProvider>();
     return Builder(
       builder: (context) {
         return playerProvider.isSongHistoryEmpty()

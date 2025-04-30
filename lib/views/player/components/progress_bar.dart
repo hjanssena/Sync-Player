@@ -26,79 +26,85 @@ class _SongProgressBarState extends State<SongProgressBar> {
   Widget build(BuildContext context) {
     final playerProvider = context.watch<PlayerProvider>();
 
-    var totalDuration = playerProvider.currentSong.duration;
-    final currentPosition = playerProvider.player.timeEllapsedMilliseconds;
-    totalDuration = totalDuration * 1000;
+    return StreamBuilder<Duration>(
+      stream: playerProvider.positionStream,
+      builder: (context, snapshot) {
+        var totalDuration = playerProvider.currentSong.duration;
+        final currentPosition =
+            snapshot.data?.inMilliseconds ?? Duration.zero.inMilliseconds;
+        totalDuration = totalDuration * 1000;
 
-    final progress = currentPosition / totalDuration;
-    final displayedProgress = _isDragging ? (_dragValue ?? progress) : progress;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SliderTheme(
-          data: SliderTheme.of(context).copyWith(
-            trackHeight: 4,
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5),
-          ),
-          child: Slider(
-            value: displayedProgress.clamp(0.0, 1.0),
-            onChangeStart: (value) {
-              setState(() {
-                _isDragging = true;
-                _dragValue = value;
-                _wasPlayingBeforeDrag =
-                    playerProvider.player.state == PlayerSt.playing;
-              });
-
-              // Auto pause
-              if (_wasPlayingBeforeDrag) {
-                playerProvider.pause();
-              }
-            },
-            onChanged: (value) {
-              setState(() {
-                _dragValue = value;
-              });
-            },
-            onChangeEnd: (value) {
-              final newPosition = (value * totalDuration).toInt();
-              playerProvider.seek(Duration(milliseconds: newPosition));
-
-              // Resume if it was playing before
-              if (_wasPlayingBeforeDrag) {
-                playerProvider.resume();
-              }
-
-              setState(() {
-                _isDragging = false;
-                _dragValue = null;
-                _wasPlayingBeforeDrag = false;
-              });
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                _formatDuration(
-                  (_isDragging
-                      ? (_dragValue! * totalDuration).toInt()
-                      : currentPosition),
-                ),
-                style: const TextStyle(fontSize: 12, color: Colors.white70),
+        final progress = currentPosition / totalDuration;
+        final displayedProgress =
+            _isDragging ? (_dragValue ?? progress) : progress;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 4,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5),
               ),
-              Text(
-                _formatDuration(totalDuration),
-                style: const TextStyle(fontSize: 12, color: Colors.white70),
+              child: Slider(
+                value: displayedProgress.clamp(0.0, 1.0),
+                onChangeStart: (value) {
+                  setState(() {
+                    _isDragging = true;
+                    _dragValue = value;
+                    _wasPlayingBeforeDrag =
+                        playerProvider.getPlayerState() == PlayerSt.playing;
+                  });
+
+                  // Auto pause
+                  if (_wasPlayingBeforeDrag) {
+                    playerProvider.pause();
+                  }
+                },
+                onChanged: (value) {
+                  setState(() {
+                    _dragValue = value;
+                  });
+                },
+                onChangeEnd: (value) {
+                  final newPosition = (value * totalDuration).toInt();
+                  playerProvider.seek(Duration(milliseconds: newPosition));
+
+                  // Resume if it was playing before
+                  if (_wasPlayingBeforeDrag) {
+                    playerProvider.resume();
+                  }
+
+                  setState(() {
+                    _isDragging = false;
+                    _dragValue = null;
+                    _wasPlayingBeforeDrag = false;
+                  });
+                },
               ),
-            ],
-          ),
-        ),
-      ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    _formatDuration(
+                      (_isDragging
+                          ? (_dragValue! * totalDuration).toInt()
+                          : currentPosition),
+                    ),
+                    style: const TextStyle(fontSize: 12, color: Colors.white70),
+                  ),
+                  Text(
+                    _formatDuration(totalDuration),
+                    style: const TextStyle(fontSize: 12, color: Colors.white70),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -108,14 +114,18 @@ class LiteProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewState = context.watch<PlayerProvider>();
-
-    var totalDuration = viewState.currentSong.duration;
-    final currentPosition = viewState.player.timeEllapsedMilliseconds;
-    totalDuration = totalDuration * 1000;
-
-    final progress = currentPosition / totalDuration;
-
-    return LinearProgressIndicator(value: progress.clamp(0, 1), minHeight: 3);
+    final playerProvider = context.watch<PlayerProvider>();
+    return StreamBuilder<Duration>(
+      stream: playerProvider.positionStream,
+      builder: (context, snapshot) {
+        final currentPosition = snapshot.data ?? Duration.zero;
+        final totalDuration = playerProvider.currentSong.duration * 1000;
+        final progress = currentPosition.inMilliseconds / totalDuration;
+        return LinearProgressIndicator(
+          value: progress.clamp(0, 1),
+          minHeight: 3,
+        );
+      },
+    );
   }
 }

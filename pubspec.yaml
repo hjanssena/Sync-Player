@@ -40,16 +40,16 @@ dependencies:
   mime: ^2.0.0
   provider: ^6.1.4
   musicbrainz_api_client: ^0.1.7
-  just_audio: ^0.10.0
-  audio_session: ^0.1.15
+  # just_audio: ^0.10.0
+  # audio_session: ^0.1.15
   audio_service: ^0.18.7
-  just_audio_media_kit: ^2.1.0
-  media_kit_libs_windows_audio: ^1.0.9
+  # just_audio_media_kit: ^2.1.0
+  # media_kit_libs_windows_audio: ^1.0.9
+  audioplayers: ^6.4.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  audioplayers_platform_interface: ^7.1.0
   json_serializable: ^6.9.5
   build_runner: ^2.4.15
 

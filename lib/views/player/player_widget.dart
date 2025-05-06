@@ -36,8 +36,10 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     super.dispose();
   }
 
-  Future<void> _handlePageChange(int value, context) async {
-    PlayerProvider playerProvider = context.read<PlayerProvider>();
+  Future<void> _handlePageChange(
+    int value,
+    PlayerProvider playerProvider,
+  ) async {
     setState(() => changingSong = true);
     if (value == 0) {
       await pageController.previousPage(
@@ -98,12 +100,12 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                           if (details.globalPosition.dx >
                               startSwipePositionX + 10) {
                             if (!playerProvider.isSongHistoryEmpty()) {
-                              _handlePageChange(0, context);
+                              _handlePageChange(0, playerProvider);
                             }
                           } else if (details.globalPosition.dx <
                               startSwipePositionX - 10) {
                             if (!playerProvider.isSongQueueEmpty()) {
-                              _handlePageChange(2, context);
+                              _handlePageChange(2, playerProvider);
                             }
                           }
                         }

@@ -37,8 +37,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
     }
   }
 
-  Future<void> _handlePageChange(double value, BuildContext context) async {
-    PlayerProvider playerProvider = context.read<PlayerProvider>();
+  Future<void> _handlePageChange(
+    double value,
+    PlayerProvider playerProvider,
+  ) async {
     setState(() => changingSong = true);
     if (value == 0) {
       await pageController.previousPage(
@@ -94,12 +96,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   if (!changingSong) {
                     if (details.globalPosition.dx > startSwipePositionX + 10) {
                       if (!playerProvider.isSongHistoryEmpty()) {
-                        _handlePageChange(0, context);
+                        _handlePageChange(0, playerProvider);
                       }
                     } else if (details.globalPosition.dx <
                         startSwipePositionX - 10) {
                       if (!playerProvider.isSongQueueEmpty()) {
-                        _handlePageChange(2, context);
+                        _handlePageChange(2, playerProvider);
                       }
                     }
                   }

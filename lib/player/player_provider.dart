@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:sync_player/Library/library_provider.dart';
 import 'package:sync_player/Library/models/models.dart';
 import 'package:sync_player/player/player.dart';
 import 'package:sync_player/player/playback_queue.dart';
+import 'package:sync_player/services/background_audio_handler.dart';
 
 /// Represents a playback update event containing the current song and state.
 class PlayerEvent {
@@ -32,6 +34,7 @@ class PlayerProvider extends ChangeNotifier {
 
   // Reference to the music library
   late final LibraryProvider _musicLibrary;
+  late final AudioHandler audioHandler;
 
   // Currently playing song
   Song currentSong = Song.empty();
@@ -44,10 +47,24 @@ class PlayerProvider extends ChangeNotifier {
       timeEllapsedMilliseconds = position.inMilliseconds;
       _positionStream.add(Duration(milliseconds: timeEllapsedMilliseconds));
     });
-
+    //Handle end of song behaviour
     _player.stateStream.listen((state) {
       if (state == PlayerSt.completed) nextSong();
     });
+    initAudioHandler();
+  }
+
+  //Initialize the handler for background playback and notification media control
+  Future<void> initAudioHandler() async {
+    audioHandler = await AudioService.init(
+      builder:
+          () => BackgroundAudioHandler(playerProvider: this) as AudioHandler,
+      config: AudioServiceConfig(
+        androidNotificationChannelId: 'com.example.sync_player.channel.audio',
+        androidNotificationChannelName: 'Sync Player',
+        androidNotificationOngoing: true,
+      ),
+    );
   }
 
   /// Injects the music library into the player provider.

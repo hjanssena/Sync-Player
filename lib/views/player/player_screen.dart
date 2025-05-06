@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/models/models.dart';
-import 'package:sync_player/main.dart';
 import 'package:sync_player/views/Player/components/media_buttons.dart';
 import 'package:sync_player/player/player_provider.dart';
 import 'package:sync_player/views/Player/components/progress_bar.dart';
@@ -38,7 +37,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
     }
   }
 
-  Future<void> _handlePageChange(double value) async {
+  Future<void> _handlePageChange(double value, BuildContext context) async {
+    PlayerProvider playerProvider = context.read<PlayerProvider>();
     setState(() => changingSong = true);
     if (value == 0) {
       await pageController.previousPage(
@@ -47,7 +47,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
       );
       snapshotController.allowSnapshotting = true;
       await Future.delayed(Duration(milliseconds: 50));
-      await audioHandler.skipToPrevious();
+      await playerProvider.previousSong();
     } else if (value == 2) {
       await pageController.nextPage(
         duration: Duration(milliseconds: 250),
@@ -55,7 +55,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
       );
       snapshotController.allowSnapshotting = true;
       await Future.delayed(Duration(milliseconds: 50));
-      await audioHandler.skipToNext();
+      await playerProvider.nextSong();
     }
     pageController.jumpToPage(1);
     snapshotController.clear();
@@ -94,12 +94,12 @@ class _PlayerScreenState extends State<PlayerScreen> {
                   if (!changingSong) {
                     if (details.globalPosition.dx > startSwipePositionX + 10) {
                       if (!playerProvider.isSongHistoryEmpty()) {
-                        _handlePageChange(0);
+                        _handlePageChange(0, context);
                       }
                     } else if (details.globalPosition.dx <
                         startSwipePositionX - 10) {
                       if (!playerProvider.isSongQueueEmpty()) {
-                        _handlePageChange(2);
+                        _handlePageChange(2, context);
                       }
                     }
                   }

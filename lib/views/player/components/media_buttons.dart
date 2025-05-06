@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sync_player/main.dart';
 import 'package:sync_player/player/player.dart';
 import 'package:sync_player/player/player_provider.dart';
 
@@ -39,6 +38,7 @@ class NextSongButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    PlayerProvider playerProvider = context.read<PlayerProvider>();
     return IconButton(
       iconSize: size,
       onPressed: () {

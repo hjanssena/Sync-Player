@@ -1,36 +1,18 @@
 import 'dart:io';
-import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/library_provider.dart';
 import 'package:sync_player/player/player_provider.dart';
 import 'package:sync_player/routes.dart';
-import 'package:sync_player/services/background_audio_handler.dart';
 import 'package:sync_player/services/file_cache.dart';
 
 late final FileCache fileCache;
-late final AudioHandler audioHandler;
-late final PlayerProvider playerProvider;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Creating references to assets that are used multiple times on the application
   fileCache = await FileCache.create();
-  //Initialize the player service
-  playerProvider = PlayerProvider();
-  //Initialize the handler for background playback and notification media control
-  audioHandler = await AudioService.init(
-    builder:
-        () =>
-            BackgroundAudioHandler(playerProvider: playerProvider)
-                as AudioHandler,
-    config: AudioServiceConfig(
-      androidNotificationChannelId: 'com.example.sync_player.channel.audio',
-      androidNotificationChannelName: 'Sync Player',
-      androidNotificationOngoing: true,
-    ),
-  );
   runApp(const Home());
 }
 
@@ -41,7 +23,8 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     ///Get storage or audio permissions in android depending on the sdk version
     if (Platform.isAndroid) getPermission();
-
+    //Initialize the player service
+    final playerProvider = PlayerProvider();
     //Adding all providers we need
     return MultiProvider(
       providers: [

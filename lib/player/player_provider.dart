@@ -49,7 +49,9 @@ class PlayerProvider extends ChangeNotifier {
     });
     //Handle end of song behaviour
     _player.stateStream.listen((state) {
-      if (state == PlayerSt.completed) nextSong();
+      if (state == PlayerSt.completed) {
+        nextSong();
+      }
     });
     initAudioHandler();
   }

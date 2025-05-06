@@ -16,6 +16,28 @@ class Player {
   // Private constructor
   Player._internal() {
     _init();
+    audioPlayer.onPlayerStateChanged.listen((state) {
+      if (state == PlayerState.playing) {
+        _setState(PlayerSt.playing);
+      } else if (state == PlayerState.paused) {
+        _setState(PlayerSt.paused);
+      } else if (state == PlayerState.completed) {
+        _setState(PlayerSt.completed);
+      } else if (state == PlayerState.stopped) {
+        _setState(PlayerSt.idle);
+      } else if (state == PlayerState.disposed) {
+        //To do
+      }
+    });
+
+    AudioContextAndroid android = AudioContextAndroid();
+    android.audioFocus;
+
+    // audioPlayer.eventStream.listen((event) {
+    //   if (event.eventType == AudioEventType.) {
+    //     player.pause();
+    //   }
+    // });
   }
 
   // Audio player instance
@@ -37,7 +59,7 @@ class Player {
   /// Initialization: setup media session, platform-specific config, and listeners
   Future<void> _init() async {
     audioPlayer.onPlayerComplete.listen((justAudioState) {
-      _setState(PlayerSt.completed); // Broadcast completion
+      //_setState(PlayerSt.completed); // Broadcast completion
     });
 
     // Track playback position
@@ -61,11 +83,11 @@ class Player {
   Future<void> resume() async {
     try {
       if (audioPlayer.source != null) {
-        _setState(PlayerSt.playing);
+        //_setState(PlayerSt.playing);
         await audioPlayer.resume();
       }
     } catch (e) {
-      _setState(PlayerSt.idle);
+      //_setState(PlayerSt.idle);
       print('Error resuming playback: $e');
     }
   }
@@ -74,7 +96,7 @@ class Player {
   Future<void> pause() async {
     try {
       if (audioPlayer.source != null) {
-        _setState(PlayerSt.paused);
+        //_setState(PlayerSt.paused);
         await audioPlayer.pause();
       }
     } catch (e) {
@@ -86,7 +108,7 @@ class Player {
   Future<void> stop() async {
     try {
       if (audioPlayer.source != null) {
-        _setState(PlayerSt.idle);
+        //_setState(PlayerSt.idle);
         await audioPlayer.stop();
       }
     } catch (e) {
@@ -109,7 +131,7 @@ class Player {
       await audioPlayer.setSource(DeviceFileSource(song.path));
       await resume();
     } catch (e) {
-      _setState(PlayerSt.idle);
+      //_setState(PlayerSt.idle);
       print('Error changing song: $e');
     }
   }

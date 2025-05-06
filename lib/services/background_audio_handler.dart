@@ -22,10 +22,11 @@ class BackgroundAudioHandler extends BaseAudioHandler with QueueHandler {
           duration: Duration(seconds: song.duration),
         ),
       );
+      _broadcastState();
+    });
 
-      playerProvider.positionStream.listen((position) {
-        _broadcastState();
-      });
+    playerProvider.positionStream.listen((position) {
+      _broadcastState();
     });
   }
 

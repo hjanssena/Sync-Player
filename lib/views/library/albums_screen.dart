@@ -45,12 +45,9 @@ class AlbumListScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(30),
-              child: Hero(
-                tag: "${library.selectedArtist.name}artist",
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.memory(library.selectedArtist.image),
-                ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Image.memory(library.selectedArtist.image),
               ),
             ),
           ),

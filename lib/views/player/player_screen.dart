@@ -76,14 +76,13 @@ class _PlayerScreenState extends State<PlayerScreen> {
         _handleVerticalSwipes(details.globalPosition.dy);
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            "Now playing",
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineLarge,
-          ),
-        ),
-
+        // appBar: AppBar(
+        //   title: Text(
+        //     "Now playing",
+        //     textAlign: TextAlign.center,
+        //     style: Theme.of(context).textTheme.headlineLarge,
+        //   ),
+        // ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -140,7 +139,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
               ],
             ),
             SongProgressBar(),
-            SizedBox(width: 100),
+            SizedBox(height: 40),
           ],
         ),
       ),
@@ -156,47 +155,62 @@ class _CurrentSongPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         SizedBox(
-          height: 300,
+          width: MediaQuery.sizeOf(context).width,
+          height: MediaQuery.sizeOf(context).height / 2,
           child: Hero(
             tag: "PlayerImg",
             child: Padding(
-              padding: const EdgeInsets.all(30),
+              padding: const EdgeInsets.all(10),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child: Image.memory(playerProvider.currentSong.album.image),
+                child: Image.memory(
+                  playerProvider.currentSong.album.image,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.center,
+                ),
               ),
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 5.0, right: 5.0, left: 5.0),
-          child: Center(
-            child: Hero(
-              tag: "ArtistInfo",
-              child: Text(
-                playerProvider.currentSong.artist.name,
-                maxLines: 1,
-                overflow: TextOverflow.fade,
-                softWrap: false,
-                style: Theme.of(context).textTheme.headlineSmall,
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                bottom: 5.0,
+                right: 5.0,
+                left: 5.0,
+              ),
+              child: Center(
+                child: Hero(
+                  tag: "ArtistInfo",
+                  child: Text(
+                    playerProvider.currentSong.artist.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.fade,
+                    softWrap: false,
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: Center(
-            child: Hero(
-              tag: "SongInfo",
-              child: Text(
-                playerProvider.currentSong.title,
-                maxLines: 1,
-                overflow: TextOverflow.fade,
-                softWrap: false,
-                style: Theme.of(context).textTheme.bodyLarge,
+            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Center(
+                child: Hero(
+                  tag: "SongInfo",
+                  child: Text(
+                    playerProvider.currentSong.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.fade,
+                    softWrap: false,
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ],
     );
@@ -213,47 +227,53 @@ class _CarouselSongPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         SizedBox(
-          height: 300,
-          child: Hero(
-            tag: "PlayerImg",
-            child: Padding(
-              padding: const EdgeInsets.all(30),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Image.memory(song.album.image),
+          width: MediaQuery.sizeOf(context).width,
+          height: MediaQuery.sizeOf(context).height / 2,
+          child: Padding(
+            padding: const EdgeInsets.all(10),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.memory(
+                song.album.image,
+                fit: BoxFit.contain,
+                alignment: Alignment.center,
               ),
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 5.0, right: 5.0, left: 5.0),
-          child: Center(
-            child: Hero(
-              tag: "ArtistInfo",
-              child: Text(
-                song.artist.name,
-                maxLines: 1,
-                overflow: TextOverflow.fade,
-                softWrap: false,
-                style: Theme.of(context).textTheme.headlineSmall,
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                bottom: 5.0,
+                right: 5.0,
+                left: 5.0,
+              ),
+              child: Center(
+                child: Text(
+                  song.artist.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
+                  softWrap: false,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
               ),
             ),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: Center(
-            child: Hero(
-              tag: "SongInfo",
-              child: Text(
-                song.title,
-                maxLines: 1,
-                overflow: TextOverflow.fade,
-                softWrap: false,
-                style: Theme.of(context).textTheme.bodyLarge,
+            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Center(
+                child: Text(
+                  song.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
+                  softWrap: false,
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ],
     );

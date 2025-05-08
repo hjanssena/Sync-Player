@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/models/models.dart';
+import 'package:sync_player/player/player.dart';
 import 'package:sync_player/views/Player/components/media_buttons.dart';
 import 'package:sync_player/player/player_provider.dart';
 import 'package:sync_player/views/Player/components/progress_bar.dart';
+import 'package:sync_player/views/player/player_screen.dart';
 
 class PlayerWidget extends StatefulWidget {
   const PlayerWidget({super.key});
@@ -64,88 +66,120 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     setState(() => changingSong = false);
   }
 
+  PageRouteBuilder _transitionToPlayer(BuildContext context) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) => PlayerScreen(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(0.0, 1.0);
+        const end = Offset.zero;
+        const curve = Curves.linear;
+
+        var tween = Tween(
+          begin: begin,
+          end: end,
+        ).chain(CurveTween(curve: curve));
+        var offsetAnimation = animation.drive(tween);
+        return SlideTransition(position: offsetAnimation, child: child);
+      },
+      transitionDuration: Duration(milliseconds: 200),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final playerProvider = context.watch<PlayerProvider>();
     //double endSwipePosition;
-
-    return Container(
-      height: 80,
-      color: const Color.fromARGB(255, 26, 25, 25),
-      child: GestureDetector(
-        onVerticalDragStart: (details) {
-          startSwipePositionY = details.globalPosition.dy;
-        },
-        onVerticalDragEnd: (details) {
-          if (details.globalPosition.dy < startSwipePositionY - 25) {
-            Navigator.pushNamed(context, '/player');
-          }
-        },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Progress bar
-            Hero(tag: "ProgressBar", child: const LiteProgressBar()),
-            // Song content and buttons
-            Expanded(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onHorizontalDragStart: (details) {
-                        startSwipePositionX = details.globalPosition.dx;
-                      },
-                      onHorizontalDragEnd: (details) {
-                        if (!changingSong) {
-                          if (details.globalPosition.dx >
-                              startSwipePositionX + 10) {
-                            if (!playerProvider.isSongHistoryEmpty()) {
-                              _handlePageChange(0, playerProvider);
+    return Builder(
+      builder: (context) {
+        if (playerProvider.getPlayerState() != PlayerSt.playing &&
+            playerProvider.getPlayerState() != PlayerSt.paused) {
+          return SizedBox(height: 0, width: 0);
+        }
+        return Container(
+          height: 80,
+          color: const Color.fromARGB(255, 26, 25, 25),
+          child: GestureDetector(
+            onVerticalDragStart: (details) {
+              startSwipePositionY = details.globalPosition.dy;
+            },
+            onVerticalDragEnd: (details) {
+              if (details.globalPosition.dy < startSwipePositionY - 25) {
+                Navigator.of(context).push(_transitionToPlayer(context));
+              }
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Progress bar
+                const LiteProgressBar(),
+                // Song content and buttons
+                Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onHorizontalDragStart: (details) {
+                            startSwipePositionX = details.globalPosition.dx;
+                          },
+                          onHorizontalDragEnd: (details) {
+                            if (!changingSong) {
+                              if (details.globalPosition.dx >
+                                  startSwipePositionX + 10) {
+                                if (!playerProvider.isSongHistoryEmpty()) {
+                                  _handlePageChange(0, playerProvider);
+                                }
+                              } else if (details.globalPosition.dx <
+                                  startSwipePositionX - 10) {
+                                if (!playerProvider.isSongQueueEmpty()) {
+                                  _handlePageChange(2, playerProvider);
+                                }
+                              }
                             }
-                          } else if (details.globalPosition.dx <
-                              startSwipePositionX - 10) {
-                            if (!playerProvider.isSongQueueEmpty()) {
-                              _handlePageChange(2, playerProvider);
-                            }
-                          }
-                        }
-                      },
-                      child: SnapshotWidget(
-                        controller: snapshotController,
-                        mode: SnapshotMode.normal,
-                        child: PageView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          controller: pageController,
-                          scrollDirection: Axis.horizontal,
-                          pageSnapping: true,
-                          children: [
-                            _CarouselSongInformation(
-                              song:
-                                  playerProvider.getLastSongInHistory() ??
-                                  Song.empty(),
+                          },
+                          child: SnapshotWidget(
+                            controller: snapshotController,
+                            mode: SnapshotMode.normal,
+                            child: PageView(
+                              physics: const NeverScrollableScrollPhysics(),
+                              controller: pageController,
+                              scrollDirection: Axis.horizontal,
+                              pageSnapping: true,
+                              children: [
+                                _CarouselSongInformation(
+                                  song:
+                                      playerProvider.getLastSongInHistory() ??
+                                      Song.empty(),
+                                ),
+                                InkWell(
+                                  onTap:
+                                      () => Navigator.of(
+                                        context,
+                                      ).push(_transitionToPlayer(context)),
+                                  child: _LiveSongInformation(
+                                    playerProvider: playerProvider,
+                                  ),
+                                ),
+                                _CarouselSongInformation(
+                                  song:
+                                      playerProvider.getNextSongInQueue() ??
+                                      Song.empty(),
+                                ),
+                              ],
+                              onPageChanged: (value) {},
                             ),
-                            _LiveSongInformation(
-                              playerProvider: playerProvider,
-                            ),
-                            _CarouselSongInformation(
-                              song:
-                                  playerProvider.getNextSongInQueue() ??
-                                  Song.empty(),
-                            ),
-                          ],
-                          onPageChanged: (value) {},
+                          ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 10),
+                      const _MediaButtons(),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  const _MediaButtons(),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -157,53 +191,50 @@ class _LiveSongInformation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => Navigator.pushNamed(context, '/player'),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 77,
-            height: 77,
+    return Row(
+      children: [
+        SizedBox(
+          width: 77,
+          height: 77,
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
             child: Hero(
               tag: "PlayerImg",
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.memory(playerProvider.currentSong.album.image),
-                ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: Image.memory(playerProvider.currentSong.album.image),
               ),
             ),
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Hero(
-                  tag: "ArtistInfo",
-                  child: Text(
-                    playerProvider.currentSong.artist.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Hero(
+                tag: "ArtistInfo",
+                child: Text(
+                  playerProvider.currentSong.artist.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                Hero(
-                  tag: "SongInfo",
-                  child: Text(
-                    playerProvider.currentSong.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
+              ),
+              Hero(
+                tag: "SongInfo",
+                child: Text(
+                  playerProvider.currentSong.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -214,53 +245,41 @@ class _CarouselSongInformation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => Navigator.pushNamed(context, '/player'),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 77,
-            height: 77,
-            child: Hero(
-              tag: "PlayerImg",
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(15),
-                  child: Image.memory(song.album.image),
-                ),
+    return Row(
+      children: [
+        SizedBox(
+          width: 77,
+          height: 77,
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(15),
+              child: Image.memory(song.album.image),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                song.artist.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
-            ),
+              Text(
+                song.title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
           ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Hero(
-                  tag: "ArtistInfo",
-                  child: Text(
-                    song.artist.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-                Hero(
-                  tag: "SongInfo",
-                  child: Text(
-                    song.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

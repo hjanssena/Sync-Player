@@ -19,12 +19,9 @@ class ArtistItem extends StatelessWidget {
             Flexible(
               child: Container(
                 padding: EdgeInsets.all(5),
-                child: Hero(
-                  tag: "${artist.name}artist",
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.memory(artist.image),
-                  ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Image.memory(artist.image),
                 ),
               ),
             ),
@@ -66,10 +63,7 @@ class AlbumItem extends StatelessWidget {
                 padding: EdgeInsets.all(5),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: Hero(
-                    tag: "${album.name}album",
-                    child: Image.memory(album.image),
-                  ),
+                  child: Image.memory(album.image),
                 ),
               ),
             ),

@@ -23,6 +23,8 @@ class LibraryProvider extends ChangeNotifier {
       }
     } else {
       state = LibraryState.idle;
+      notifyListeners();
+      await library.refreshLibrary();
     }
     notifyListeners();
   }

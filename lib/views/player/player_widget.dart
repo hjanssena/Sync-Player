@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/models/models.dart';
+import 'package:sync_player/main.dart';
 import 'package:sync_player/player/player.dart';
 import 'package:sync_player/views/Player/components/media_buttons.dart';
 import 'package:sync_player/player/player_provider.dart';
@@ -202,7 +203,10 @@ class _LiveSongInformation extends StatelessWidget {
               tag: "PlayerImg",
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(15),
-                child: Image.memory(playerProvider.currentSong.album.image),
+                child: FadeInImage(
+                  placeholder: MemoryImage(fileCache.emptyImage),
+                  image: MemoryImage(playerProvider.currentSong.album.image),
+                ),
               ),
             ),
           ),

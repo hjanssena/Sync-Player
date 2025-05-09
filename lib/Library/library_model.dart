@@ -52,7 +52,6 @@ class Library {
         }
       }
     }
-    refreshLibrary();
   }
 
   ///Saves the library and dir sources to json

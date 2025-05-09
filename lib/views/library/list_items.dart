@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/library_provider.dart';
 import 'package:sync_player/Library/models/models.dart';
+import 'package:sync_player/main.dart';
 import 'package:sync_player/player/player.dart';
 import 'package:sync_player/player/player_provider.dart';
 
@@ -21,7 +22,12 @@ class ArtistItem extends StatelessWidget {
                 padding: EdgeInsets.all(5),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: Image.memory(artist.image),
+                  child: FadeInImage(
+                    placeholder: MemoryImage(fileCache.emptyImage),
+                    image: MemoryImage(artist.image),
+                    fadeInDuration: Duration(milliseconds: 150),
+                    fadeOutDuration: Duration(milliseconds: 10),
+                  ),
                 ),
               ),
             ),
@@ -63,7 +69,12 @@ class AlbumItem extends StatelessWidget {
                 padding: EdgeInsets.all(5),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
-                  child: Image.memory(album.image),
+                  child: FadeInImage(
+                    placeholder: MemoryImage(fileCache.emptyImage),
+                    image: MemoryImage(album.image),
+                    fadeInDuration: Duration(milliseconds: 150),
+                    fadeOutDuration: Duration(milliseconds: 10),
+                  ),
                 ),
               ),
             ),

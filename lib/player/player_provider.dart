@@ -52,7 +52,7 @@ class PlayerProvider extends ChangeNotifier {
       if (state == PlayerSt.completed) {
         nextSong();
       }
-      notifyListeners();
+      _broadcast();
     });
     initAudioHandler();
   }

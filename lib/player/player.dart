@@ -42,7 +42,7 @@ class Player {
       StreamController<PlayerSt>.broadcast();
   Stream<PlayerSt> get stateStream => _stateStreamController.stream;
 
-  /// Initialization: setup media session, platform-specific config, and listeners
+  /// Initialization: setup audio session, platform-specific config and listeners
   Future<void> _init() async {
     //On song finish broadcast completion
     audioPlayer.onPlayerComplete.listen((justAudioState) {
@@ -51,9 +51,7 @@ class Player {
 
     //Set audiosession instance for communication with android and ios
     session = await AudioSession.instance;
-    await session.configure(AudioSessionConfiguration.music());
-    await session.setActive(true);
-    await setAudioSessionListener();
+    await setAudioSession();
 
     // Track playback position
     audioPlayer.onPositionChanged.listen((position) {
@@ -133,7 +131,9 @@ class Player {
     }
   }
 
-  Future<void> setAudioSessionListener() async {
+  Future<void> setAudioSession() async {
+    await session.configure(AudioSessionConfiguration.music());
+    await session.setActive(true);
     session.interruptionEventStream.listen((event) async {
       if (event.begin) {
         switch (event.type) {

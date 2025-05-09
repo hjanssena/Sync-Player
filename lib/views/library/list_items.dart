@@ -128,7 +128,7 @@ class SongItem extends StatelessWidget {
           onTap: () {
             if (playerProvider.currentSong == song) {
               if (playerProvider.getPlayerState() == PlayerSt.playing) {
-                playerProvider.stop();
+                playerProvider.pause();
               } else {
                 playerProvider.resume();
               }

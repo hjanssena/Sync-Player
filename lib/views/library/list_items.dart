@@ -25,8 +25,8 @@ class ArtistItem extends StatelessWidget {
                   child: FadeInImage(
                     placeholder: MemoryImage(fileCache.emptyImage),
                     image: MemoryImage(artist.image),
-                    fadeInDuration: Duration(milliseconds: 150),
-                    fadeOutDuration: Duration(milliseconds: 10),
+                    fadeInDuration: Duration(milliseconds: 160),
+                    fadeOutDuration: Duration(milliseconds: 50),
                   ),
                 ),
               ),
@@ -72,8 +72,8 @@ class AlbumItem extends StatelessWidget {
                   child: FadeInImage(
                     placeholder: MemoryImage(fileCache.emptyImage),
                     image: MemoryImage(album.image),
-                    fadeInDuration: Duration(milliseconds: 150),
-                    fadeOutDuration: Duration(milliseconds: 10),
+                    fadeInDuration: Duration(milliseconds: 160),
+                    fadeOutDuration: Duration(milliseconds: 50),
                   ),
                 ),
               ),
@@ -104,9 +104,8 @@ class AlbumItem extends StatelessWidget {
 
 class SongItem extends StatelessWidget {
   final Song song;
-
-  ///List of songs that are currently being displayed on-screen.
-  ///Can be an album, a randomized playlist or an user-made playlist.
+  //List of songs that are currently being displayed on-screen.
+  //Can be an album, a randomized playlist or an user-made playlist.
   final PlayList currentPlaylistOnScreen;
   const SongItem({
     super.key,

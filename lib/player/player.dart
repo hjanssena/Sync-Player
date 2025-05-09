@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:sync_player/Library/models/models.dart';
+import 'package:audio_session/audio_session.dart';
 
 /// Enum representing player state
 enum PlayerSt { idle, playing, changingAudio, paused, completed }
@@ -26,41 +27,33 @@ class Player {
       } else if (state == PlayerState.stopped) {
         _setState(PlayerSt.idle);
       } else if (state == PlayerState.disposed) {
-        //To do
+        dispose();
       }
     });
-
-    AudioContextAndroid android = AudioContextAndroid();
-    android.audioFocus;
-
-    // audioPlayer.eventStream.listen((event) {
-    //   if (event.eventType == AudioEventType.) {
-    //     player.pause();
-    //   }
-    // });
   }
 
-  // Audio player instance
   final AudioPlayer audioPlayer = AudioPlayer();
-
-  // Player state
   PlayerSt state = PlayerSt.idle;
-
-  // Time elapsed in milliseconds
   int timeEllapsedMilliseconds = 0;
+  late final AudioSession session;
 
   // Stream controller for broadcasting player state changes
   final StreamController<PlayerSt> _stateStreamController =
       StreamController<PlayerSt>.broadcast();
-
-  // Public state stream
   Stream<PlayerSt> get stateStream => _stateStreamController.stream;
 
   /// Initialization: setup media session, platform-specific config, and listeners
   Future<void> _init() async {
+    //On song finish broadcast completion
     audioPlayer.onPlayerComplete.listen((justAudioState) {
-      //_setState(PlayerSt.completed); // Broadcast completion
+      _setState(PlayerSt.completed);
     });
+
+    //Set audiosession instance for communication with android and ios
+    session = await AudioSession.instance;
+    await session.configure(AudioSessionConfiguration.music());
+    await session.setActive(true);
+    await setAudioSessionListener();
 
     // Track playback position
     audioPlayer.onPositionChanged.listen((position) {
@@ -83,11 +76,9 @@ class Player {
   Future<void> resume() async {
     try {
       if (audioPlayer.source != null) {
-        //_setState(PlayerSt.playing);
         await audioPlayer.resume();
       }
     } catch (e) {
-      //_setState(PlayerSt.idle);
       print('Error resuming playback: $e');
     }
   }
@@ -96,7 +87,6 @@ class Player {
   Future<void> pause() async {
     try {
       if (audioPlayer.source != null) {
-        //_setState(PlayerSt.paused);
         await audioPlayer.pause();
       }
     } catch (e) {
@@ -108,7 +98,6 @@ class Player {
   Future<void> stop() async {
     try {
       if (audioPlayer.source != null) {
-        //_setState(PlayerSt.idle);
         await audioPlayer.stop();
       }
     } catch (e) {
@@ -131,7 +120,6 @@ class Player {
       await audioPlayer.setSource(DeviceFileSource(song.path));
       await resume();
     } catch (e) {
-      //_setState(PlayerSt.idle);
       print('Error changing song: $e');
     }
   }
@@ -143,6 +131,47 @@ class Player {
     } catch (e) {
       print('Error setting volume: $e');
     }
+  }
+
+  Future<void> setAudioSessionListener() async {
+    session.interruptionEventStream.listen((event) async {
+      if (event.begin) {
+        switch (event.type) {
+          case AudioInterruptionType.duck:
+            await setVolume(30);
+            break;
+          case AudioInterruptionType.pause:
+            break;
+          case AudioInterruptionType.unknown:
+            pause();
+            break;
+        }
+      } else {
+        switch (event.type) {
+          case AudioInterruptionType.duck:
+            setVolume(100);
+            break;
+          case AudioInterruptionType.pause:
+            resume();
+            break;
+          case AudioInterruptionType.unknown:
+            // The interruption ended but we should not resume.
+            break;
+        }
+      }
+    });
+    //On headphone disconnect, pause
+    session.becomingNoisyEventStream.listen((_) {
+      pause();
+    });
+    //On bluetooth output device disconnect, pause
+    session.devicesChangedEventStream.listen((event) {
+      for (AudioDevice dev in event.devicesRemoved) {
+        if (dev.isOutput && dev.type == AudioDeviceType.bluetoothA2dp) {
+          pause();
+        }
+      }
+    });
   }
 
   /// Clean up audio player and stream controller

@@ -206,6 +206,8 @@ class _LiveSongInformation extends StatelessWidget {
                 child: FadeInImage(
                   placeholder: MemoryImage(fileCache.emptyImage),
                   image: MemoryImage(playerProvider.currentSong.album.image),
+                  fadeInDuration: Duration(milliseconds: 200),
+                  fadeOutDuration: Duration(milliseconds: 50),
                 ),
               ),
             ),

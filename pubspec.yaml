@@ -46,6 +46,7 @@ dependencies:
   # just_audio_media_kit: ^2.1.0
   # media_kit_libs_windows_audio: ^1.0.9
   audioplayers: ^6.4.0
+  audio_session: ^0.2.1
 
 dev_dependencies:
   flutter_test:

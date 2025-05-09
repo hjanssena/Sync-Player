@@ -18,7 +18,6 @@ Future<void> main() async {
 
 class Home extends StatelessWidget {
   const Home({super.key});
-
   @override
   Widget build(BuildContext context) {
     ///Get storage or audio permissions in android depending on the sdk version

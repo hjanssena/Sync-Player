@@ -6,8 +6,6 @@ import 'package:sync_player/player/player_provider.dart';
 
 class BackgroundAudioHandler extends BaseAudioHandler with QueueHandler {
   final PlayerProvider playerProvider;
-  Timer? _positionUpdateTimer;
-  late final StreamSubscription<Duration> _positionStreamSub;
 
   BackgroundAudioHandler({required this.playerProvider}) {
     // Set current media item when song changes
@@ -20,6 +18,7 @@ class BackgroundAudioHandler extends BaseAudioHandler with QueueHandler {
           title: song.title,
           artist: song.artist.name,
           duration: Duration(seconds: song.duration),
+          artUri: playerEvent.art,
         ),
       );
       _broadcastState();
@@ -79,9 +78,4 @@ class BackgroundAudioHandler extends BaseAudioHandler with QueueHandler {
 
   @override
   Future<void> skipToPrevious() => playerProvider.previousSong();
-
-  void dispose() {
-    _positionStreamSub.cancel();
-    _positionUpdateTimer?.cancel();
-  }
 }

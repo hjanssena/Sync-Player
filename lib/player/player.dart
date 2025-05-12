@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
+import 'package:audio_session/audio_session.dart' as s;
+import 'package:just_audio/just_audio.dart';
 import 'package:sync_player/Library/models/models.dart';
-import 'package:audio_session/audio_session.dart';
+import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 
 /// Enum representing player state
 enum PlayerSt { idle, playing, changingAudio, paused, completed }
@@ -17,25 +18,12 @@ class Player {
   // Private constructor
   Player._internal() {
     _init();
-    audioPlayer.onPlayerStateChanged.listen((state) {
-      if (state == PlayerState.playing) {
-        _setState(PlayerSt.playing);
-      } else if (state == PlayerState.paused) {
-        _setState(PlayerSt.paused);
-      } else if (state == PlayerState.completed) {
-        _setState(PlayerSt.completed);
-      } else if (state == PlayerState.stopped) {
-        _setState(PlayerSt.idle);
-      } else if (state == PlayerState.disposed) {
-        dispose();
-      }
-    });
   }
 
   final AudioPlayer audioPlayer = AudioPlayer();
+  late final s.AudioSession session;
   PlayerSt state = PlayerSt.idle;
   int timeEllapsedMilliseconds = 0;
-  late final AudioSession session;
 
   // Stream controller for broadcasting player state changes
   final StreamController<PlayerSt> _stateStreamController =
@@ -44,24 +32,25 @@ class Player {
 
   /// Initialization: setup audio session, platform-specific config and listeners
   Future<void> _init() async {
-    //On song finish broadcast completion
-    audioPlayer.onPlayerComplete.listen((justAudioState) {
-      _setState(PlayerSt.completed);
-    });
-
-    //Set audiosession instance for communication with android and ios
-    session = await AudioSession.instance;
-    await setAudioSession();
-
-    // Track playback position
-    audioPlayer.onPositionChanged.listen((position) {
+    JustAudioMediaKit.ensureInitialized();
+    // Setup position tracking
+    audioPlayer.positionStream.listen((position) {
       timeEllapsedMilliseconds = position.inMilliseconds;
     });
 
-    // Default volume on Windows
+    //Listen to when player completes the current song
+    audioPlayer.playerStateStream.listen((playerState) {
+      final processingState = playerState.processingState;
+      if (processingState == ProcessingState.completed) {
+        _setState(PlayerSt.completed);
+      }
+    });
+
+    // Set default volume on Windows
     if (Platform.isWindows) {
-      audioPlayer.setVolume(0.7);
+      await audioPlayer.setVolume(0.7);
     }
+    await setAudioSession();
   }
 
   /// Helper to update player state and notify listeners
@@ -70,12 +59,17 @@ class Player {
     _stateStreamController.add(state);
   }
 
-  /// Resume playback if an audio source is loaded
+  /// Resume playback if ready
   Future<void> resume() async {
     try {
-      if (audioPlayer.source != null) {
-        await audioPlayer.resume();
+      if ((Platform.isAndroid || Platform.isIOS)) {
+        if (!await session.setActive(true)) {
+          print('Audio session could not be activated');
+          return;
+        }
       }
+      audioPlayer.play();
+      _setState(PlayerSt.playing);
     } catch (e) {
       print('Error resuming playback: $e');
     }
@@ -84,9 +78,8 @@ class Player {
   /// Pause playback
   Future<void> pause() async {
     try {
-      if (audioPlayer.source != null) {
-        await audioPlayer.pause();
-      }
+      await audioPlayer.pause();
+      _setState(PlayerSt.paused);
     } catch (e) {
       print('Error pausing playback: $e');
     }
@@ -95,9 +88,8 @@ class Player {
   /// Stop playback
   Future<void> stop() async {
     try {
-      if (audioPlayer.source != null) {
-        await audioPlayer.stop();
-      }
+      await audioPlayer.stop();
+      _setState(PlayerSt.idle);
     } catch (e) {
       print('Error stopping playback: $e');
     }
@@ -115,7 +107,9 @@ class Player {
   /// Load a new song and start playback
   Future<void> changeSongAndPlay(Song song) async {
     try {
-      await audioPlayer.setSource(DeviceFileSource(song.path));
+      final fileSource = AudioSource.uri(Uri.file(song.path));
+      await audioPlayer.stop();
+      await audioPlayer.setAudioSource(fileSource);
       await resume();
     } catch (e) {
       print('Error changing song: $e');
@@ -131,43 +125,60 @@ class Player {
     }
   }
 
+  /// Set up audio session and platform-specific interruptions on Android and IOS
   Future<void> setAudioSession() async {
-    await session.configure(AudioSessionConfiguration.music());
-    await session.setActive(true);
-    session.interruptionEventStream.listen((event) async {
+    if (!Platform.isAndroid && !Platform.isIOS) return;
+    session = await s.AudioSession.instance;
+    await session.configure(
+      s.AudioSessionConfiguration(
+        avAudioSessionCategory: s.AVAudioSessionCategory.playback,
+        avAudioSessionMode: s.AVAudioSessionMode.defaultMode,
+        avAudioSessionCategoryOptions:
+            s.AVAudioSessionCategoryOptions.duckOthers,
+        androidAudioAttributes: const s.AndroidAudioAttributes(
+          contentType: s.AndroidAudioContentType.music,
+          usage: s.AndroidAudioUsage.media,
+        ),
+        androidAudioFocusGainType: s.AndroidAudioFocusGainType.gain,
+      ),
+    );
+
+    // Handle interruptions
+    session.interruptionEventStream.listen((event) {
       if (event.begin) {
         switch (event.type) {
-          case AudioInterruptionType.duck:
-            await setVolume(30);
+          case s.AudioInterruptionType.duck:
+            setVolume(.3);
             break;
-          case AudioInterruptionType.pause:
-            break;
-          case AudioInterruptionType.unknown:
+          case s.AudioInterruptionType.pause:
+          case s.AudioInterruptionType.unknown:
             pause();
             break;
         }
       } else {
         switch (event.type) {
-          case AudioInterruptionType.duck:
-            setVolume(100);
+          case s.AudioInterruptionType.duck:
+            setVolume(1);
             break;
-          case AudioInterruptionType.pause:
+          case s.AudioInterruptionType.pause:
             resume();
             break;
-          case AudioInterruptionType.unknown:
-            // The interruption ended but we should not resume.
+          case s.AudioInterruptionType.unknown:
+            // Don't resume
             break;
         }
       }
     });
-    //On headphone disconnect, pause
+
+    // On headphone unplug, pause
     session.becomingNoisyEventStream.listen((_) {
       pause();
     });
-    //On bluetooth output device disconnect, pause
+
+    // On Bluetooth disconnect, pause
     session.devicesChangedEventStream.listen((event) {
-      for (AudioDevice dev in event.devicesRemoved) {
-        if (dev.isOutput && dev.type == AudioDeviceType.bluetoothA2dp) {
+      for (s.AudioDevice dev in event.devicesRemoved) {
+        if (dev.isOutput && dev.type == s.AudioDeviceType.bluetoothA2dp) {
           pause();
         }
       }
@@ -175,8 +186,10 @@ class Player {
   }
 
   /// Clean up audio player and stream controller
+  bool _isDisposed = false;
   void dispose() {
-    audioPlayer.release();
+    if (_isDisposed) return;
+    _isDisposed = true;
     audioPlayer.dispose();
     _stateStreamController.close();
   }

@@ -48,23 +48,26 @@ class Home extends StatelessWidget {
   }
 
   Future<void> getPermission() async {
-    var audioStatus = await Permission.audio.status;
-
-    if (!audioStatus.isGranted) {
-      try {
-        await Permission.audio.request();
-      } catch (e) {
-        //not supported by the phone
+    if (Platform.isAndroid) {
+      var audioStatus = await Permission.audio.status;
+      if (!audioStatus.isGranted) {
+        var status = await Permission.audio.request();
+        if (status.isDenied) {
+          // Pending implementation
+          print("Audio permission denied");
+        }
       }
-    }
 
-    var storageStatus = await Permission.storage.status;
-    if (!storageStatus.isGranted) {
-      try {
-        await Permission.storage.request();
-      } catch (e) {
-        //Not supported by the phone
+      var storageStatus = await Permission.storage.status;
+      if (!storageStatus.isGranted) {
+        var status = await Permission.storage.request();
+        if (status.isDenied) {
+          // Pending implementation
+          print("Storage permission denied");
+        }
       }
+    } else if (Platform.isIOS) {
+      // Pending implementation
     }
   }
 }

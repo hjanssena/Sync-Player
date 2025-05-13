@@ -162,7 +162,7 @@ class PlayerProvider extends ChangeNotifier {
     if (Platform.isIOS || Platform.isAndroid) {
       final tempDir = await getTemporaryDirectory();
       final file = File(
-        "${tempDir.path}/${currentSong.id}-${currentSong.title}-${currentSong.album.name}-${currentSong.artist.name}",
+        "${tempDir.path}/${sanitizePath('${currentSong.id}-${currentSong.title}-${currentSong.album.name}-${currentSong.artist.name}')}",
       );
       await file.writeAsBytes(
         song.album.image,
@@ -170,6 +170,11 @@ class PlayerProvider extends ChangeNotifier {
       ); // Overwrites each time
       _currentArtUri = file.uri;
     }
+  }
+
+  String sanitizePath(String input) {
+    // Replace slashes with an underscore or another safe character
+    return input.replaceAll(RegExp(r'[\/:*?"<>|]'), '_');
   }
 
   // === Utility accessors ===

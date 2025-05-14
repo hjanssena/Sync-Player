@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:json_annotation/json_annotation.dart';
 import 'package:sync_player/main.dart';
+import 'package:crypto/crypto.dart';
 part 'models.g.dart';
 
 // Convert images to base64
@@ -21,7 +22,9 @@ class Directories {
 
 @JsonSerializable()
 class Song {
-  int id;
+  final String uuid;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final String contentHash;
   String path;
   String title;
   String albumArtist;
@@ -32,13 +35,16 @@ class Song {
   int duration;
   int year;
   bool scraped;
+  DateTime lastModified;
+
   @JsonKey(includeFromJson: false, includeToJson: false)
   Artist artist = Artist.empty();
+
   @JsonKey(includeFromJson: false, includeToJson: false)
   Album album = Album.empty();
 
   Song({
-    required this.id,
+    required this.uuid,
     required this.path,
     required this.title,
     required this.albumArtist,
@@ -49,11 +55,28 @@ class Song {
     required this.duration,
     required this.year,
     required this.scraped,
-  });
+    required this.lastModified,
+  }) : contentHash = _generateContentHash(
+         albumArtist,
+         trackArtist,
+         title,
+         duration,
+       );
+
+  static String _generateContentHash(
+    String albumArtist,
+    String trackArtist,
+    String title,
+    int duration,
+  ) {
+    final content =
+        '$albumArtist|$trackArtist|$title|$duration'.toLowerCase().trim();
+    return sha1.convert(utf8.encode(content)).toString();
+  }
 
   static Song empty() {
     return Song(
-      id: -1 >>> 1,
+      uuid: '',
       path: '',
       title: '',
       albumArtist: '',
@@ -64,6 +87,7 @@ class Song {
       duration: 0,
       year: 0,
       scraped: false,
+      lastModified: DateTime.now(),
     );
   }
 
@@ -78,20 +102,22 @@ class Album extends PlayList {
   bool scraped;
 
   Album({
-    required super.id,
+    required super.uuid,
     required super.name,
     required super.songs,
+    required super.lastModified,
     required this.image,
     required this.scraped,
   });
 
   static Album empty() {
     return Album(
-      id: -1 >>> 1,
+      uuid: '',
       name: '',
       songs: const [],
       image: fileCache.placeholderImage,
       scraped: false,
+      lastModified: DateTime.now(),
     );
   }
 
@@ -102,11 +128,17 @@ class Album extends PlayList {
 
 @JsonSerializable()
 class PlayList {
-  int id;
+  String uuid;
   String name;
+  DateTime lastModified;
   List<Song> songs;
 
-  PlayList({this.id = -1 >>> 1, this.name = '', this.songs = const []});
+  PlayList({
+    required this.uuid,
+    required this.name,
+    required this.lastModified,
+    required this.songs,
+  });
 
   factory PlayList.fromJson(Map<String, dynamic> json) =>
       _$PlayListFromJson(json);
@@ -115,28 +147,31 @@ class PlayList {
 
 @JsonSerializable()
 class Artist {
-  int id;
+  String uuid;
   String name;
   @JsonKey(fromJson: _uint8ListFromBase64, toJson: _uint8ListToBase64)
   Uint8List image;
   List<Album> albums;
   bool scraped;
+  DateTime lastModified;
 
   Artist({
-    required this.id,
+    required this.uuid,
     required this.name,
     required this.image,
     required this.albums,
     required this.scraped,
+    required this.lastModified,
   });
 
   static Artist empty() {
     return Artist(
-      id: -1 >>> 1,
+      uuid: '',
       name: '',
       image: fileCache.placeholderImage,
       albums: [],
       scraped: false,
+      lastModified: DateTime.now(),
     );
   }
 

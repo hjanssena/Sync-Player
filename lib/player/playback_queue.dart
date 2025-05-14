@@ -50,7 +50,7 @@ class PlaybackQueue {
 
   /// Fills the queue with the songs that come after [currentSong] in the given playlist.
   void fillFromPlaylist(PlayList playlist, Song currentSong) {
-    int index = playlist.songs.indexWhere((s) => s.id == currentSong.id);
+    int index = playlist.songs.indexWhere((s) => s.uuid == currentSong.uuid);
     if (index != -1) {
       // Add remaining songs after the current one
       for (int i = index + 1; i < playlist.songs.length; i++) {

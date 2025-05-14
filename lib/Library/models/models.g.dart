@@ -16,7 +16,7 @@ Map<String, dynamic> _$DirectoriesToJson(Directories instance) =>
     <String, dynamic>{'paths': instance.paths};
 
 Song _$SongFromJson(Map<String, dynamic> json) => Song(
-  id: (json['id'] as num).toInt(),
+  uuid: json['uuid'] as String,
   path: json['path'] as String,
   title: json['title'] as String,
   albumArtist: json['albumArtist'] as String,
@@ -27,10 +27,11 @@ Song _$SongFromJson(Map<String, dynamic> json) => Song(
   duration: (json['duration'] as num).toInt(),
   year: (json['year'] as num).toInt(),
   scraped: json['scraped'] as bool,
+  lastModified: DateTime.parse(json['lastModified'] as String),
 );
 
 Map<String, dynamic> _$SongToJson(Song instance) => <String, dynamic>{
-  'id': instance.id,
+  'uuid': instance.uuid,
   'path': instance.path,
   'title': instance.title,
   'albumArtist': instance.albumArtist,
@@ -41,45 +42,49 @@ Map<String, dynamic> _$SongToJson(Song instance) => <String, dynamic>{
   'duration': instance.duration,
   'year': instance.year,
   'scraped': instance.scraped,
+  'lastModified': instance.lastModified.toIso8601String(),
 };
 
 Album _$AlbumFromJson(Map<String, dynamic> json) => Album(
-  id: (json['id'] as num).toInt(),
+  uuid: json['uuid'] as String,
   name: json['name'] as String,
   songs:
       (json['songs'] as List<dynamic>)
           .map((e) => Song.fromJson(e as Map<String, dynamic>))
           .toList(),
+  lastModified: DateTime.parse(json['lastModified'] as String),
   image: _uint8ListFromBase64(json['image'] as String),
   scraped: json['scraped'] as bool,
 );
 
 Map<String, dynamic> _$AlbumToJson(Album instance) => <String, dynamic>{
-  'id': instance.id,
+  'uuid': instance.uuid,
   'name': instance.name,
+  'lastModified': instance.lastModified.toIso8601String(),
   'songs': instance.songs,
   'image': _uint8ListToBase64(instance.image),
   'scraped': instance.scraped,
 };
 
 PlayList _$PlayListFromJson(Map<String, dynamic> json) => PlayList(
-  id: (json['id'] as num?)?.toInt() ?? -1 >>> 1,
-  name: json['name'] as String? ?? '',
+  uuid: json['uuid'] as String,
+  name: json['name'] as String,
+  lastModified: DateTime.parse(json['lastModified'] as String),
   songs:
-      (json['songs'] as List<dynamic>?)
-          ?.map((e) => Song.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
+      (json['songs'] as List<dynamic>)
+          .map((e) => Song.fromJson(e as Map<String, dynamic>))
+          .toList(),
 );
 
 Map<String, dynamic> _$PlayListToJson(PlayList instance) => <String, dynamic>{
-  'id': instance.id,
+  'uuid': instance.uuid,
   'name': instance.name,
+  'lastModified': instance.lastModified.toIso8601String(),
   'songs': instance.songs,
 };
 
 Artist _$ArtistFromJson(Map<String, dynamic> json) => Artist(
-  id: (json['id'] as num).toInt(),
+  uuid: json['uuid'] as String,
   name: json['name'] as String,
   image: _uint8ListFromBase64(json['image'] as String),
   albums:
@@ -87,12 +92,14 @@ Artist _$ArtistFromJson(Map<String, dynamic> json) => Artist(
           .map((e) => Album.fromJson(e as Map<String, dynamic>))
           .toList(),
   scraped: json['scraped'] as bool,
+  lastModified: DateTime.parse(json['lastModified'] as String),
 );
 
 Map<String, dynamic> _$ArtistToJson(Artist instance) => <String, dynamic>{
-  'id': instance.id,
+  'uuid': instance.uuid,
   'name': instance.name,
   'image': _uint8ListToBase64(instance.image),
   'albums': instance.albums,
   'scraped': instance.scraped,
+  'lastModified': instance.lastModified.toIso8601String(),
 };

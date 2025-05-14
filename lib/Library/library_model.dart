@@ -182,9 +182,9 @@ class Library {
   Future<void> _addSongToLibrary(String filePath) async {
     //Get metadata and create song object
     Tag? tag = await AudioTags.read(filePath);
-    Song song = utils.createSong(filePath, tag, _allSongs.length);
+    Song song = LibraryUtils.createSong(filePath, tag);
     //Get image from song metadata if it exist to add to artist or album if needed
-    Uint8List? image = utils.getImage(tag);
+    Uint8List? image = LibraryUtils.getImage(tag);
     _allSongs.add(song);
     //Get album and artist to establish relations. The artist has albums and albums has songs. Each song also has reference to it's album and artist to make things simpler.
     Artist artist = _getArtistFromSong(song, image);
@@ -199,13 +199,7 @@ class Library {
     Artist artist = _artists.firstWhere(
       (element) => element.name.toLowerCase() == song.albumArtist.toLowerCase(),
       orElse: () {
-        Artist newArtist = Artist(
-          id: _artists.length,
-          name: song.albumArtist,
-          image: image,
-          albums: [],
-          scraped: false,
-        );
+        Artist newArtist = LibraryUtils.createArtist(song, image);
         _artists.add(newArtist);
         return newArtist;
       },
@@ -219,13 +213,7 @@ class Library {
     Album album = artist.albums.firstWhere(
       (element) => element.name.toLowerCase() == song.albumName.toLowerCase(),
       orElse: () {
-        Album newAlbum = Album(
-          id: _allAlbums.length,
-          name: song.albumName,
-          image: image,
-          songs: [],
-          scraped: false,
-        );
+        Album newAlbum = LibraryUtils.createAlbum(song, artist, image);
         artist.albums.add(newAlbum);
         return newAlbum;
       },

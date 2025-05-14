@@ -14,9 +14,10 @@ class AlbumListScreen extends StatelessWidget {
     final List<Song> allArtistSongs = library.getArtistSongs();
     allArtistSongs.shuffle();
     final PlayList randomizedPlayList = PlayList(
-      id: -1 >>> 1,
+      uuid: '',
       name: "Random ${library.selectedArtist.name}",
       songs: allArtistSongs,
+      lastModified: DateTime.now(),
     );
     return Scaffold(
       body: CustomScrollView(

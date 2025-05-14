@@ -88,7 +88,7 @@ class PlayerProvider extends ChangeNotifier {
 
   /// Starts playback or resumes the current song if already set.
   Future<void> resume() async {
-    if (currentSong.id == -1 >>> 1) {
+    if (currentSong.uuid == '') {
       currentSong = _musicLibrary.getRandomSong();
       await _player.changeSongAndPlay(currentSong);
     } else {
@@ -117,7 +117,7 @@ class PlayerProvider extends ChangeNotifier {
 
   /// Sets a specific song and playlist as the current playback context.
   Future<void> setSongAndPlaylist(Song song, PlayList playlist) async {
-    if (currentSong.id != -1 >>> 1) _playbackQueue.addToHistory(currentSong);
+    if (currentSong.uuid != '') _playbackQueue.addToHistory(currentSong);
     currentSong = song;
     await _saveNowPlayingImage(currentSong);
     await _player.changeSongAndPlay(currentSong);
@@ -129,7 +129,7 @@ class PlayerProvider extends ChangeNotifier {
 
   /// Plays the next song in the queue or selects a random one if the queue is empty.
   Future<void> nextSong() async {
-    if (currentSong.id != -1 >>> 1) _playbackQueue.addToHistory(currentSong);
+    if (currentSong.uuid != '') _playbackQueue.addToHistory(currentSong);
 
     currentSong = _playbackQueue.next() ?? _musicLibrary.getRandomSong();
     await _saveNowPlayingImage(currentSong);
@@ -167,20 +167,13 @@ class PlayerProvider extends ChangeNotifier {
   Future<void> _saveNowPlayingImage(Song song) async {
     if (Platform.isIOS || Platform.isAndroid) {
       final tempDir = await getTemporaryDirectory();
-      final file = File(
-        "${tempDir.path}/${sanitizePath('${currentSong.id}-${currentSong.title}-${currentSong.album.name}-${currentSong.artist.name}')}",
-      );
+      final file = File("${tempDir.path}/${currentSong.uuid}");
       await file.writeAsBytes(
         song.album.image,
         flush: true,
       ); // Overwrites each time
       _currentArtUri = file.uri;
     }
-  }
-
-  String sanitizePath(String input) {
-    // Replace slashes with an underscore or another safe character
-    return input.replaceAll(RegExp(r'[\/:*?"<>|]'), '_');
   }
 
   // === Utility accessors ===

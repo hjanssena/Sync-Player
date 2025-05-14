@@ -45,7 +45,7 @@ class LibraryProvider extends ChangeNotifier {
   ///Returns a list of albums depending on the selected artist. Add filtering later
   List<Album> displayedAlbums() {
     List<Album> albums;
-    if (selectedArtist.id != -1 >>> 1) {
+    if (selectedArtist.uuid != '') {
       albums = selectedArtist.albums;
     } else {
       albums = library.getAllAlbums();

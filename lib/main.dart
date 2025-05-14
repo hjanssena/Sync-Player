@@ -13,17 +13,19 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Creating references to assets that are used multiple times on the application
   fileCache = await FileCache.create();
-  runApp(const Home());
+  //Initialize the player service
+  final PlayerProvider playerProvider = PlayerProvider();
+  runApp(Home(playerProvider: playerProvider));
 }
 
 class Home extends StatelessWidget {
-  const Home({super.key});
+  final PlayerProvider playerProvider;
+  const Home({super.key, required this.playerProvider});
   @override
   Widget build(BuildContext context) {
     ///Get storage or audio permissions in android depending on the sdk version
     if (Platform.isAndroid) getPermission();
-    //Initialize the player service
-    final playerProvider = PlayerProvider();
+
     //Adding all providers we need
     return MultiProvider(
       providers: [
@@ -40,6 +42,7 @@ class Home extends StatelessWidget {
             library.init();
           });
           //Set library reference to player
+
           context.read<PlayerProvider>().setLibrary(library);
           return MaterialApp(routes: appRoutes, theme: ThemeData.dark());
         },

@@ -3,8 +3,9 @@ import 'dart:io';
 
 import 'package:audio_session/audio_session.dart' as s;
 import 'package:just_audio/just_audio.dart';
-import 'package:sync_player/Library/models/models.dart';
 import 'package:just_audio_media_kit/just_audio_media_kit.dart';
+import 'package:sync_player/Library/models/models.dart';
+//import 'package:just_audio_media_kit/just_audio_media_kit.dart';
 
 /// Enum representing player state
 enum PlayerSt { idle, playing, changingAudio, paused, completed }
@@ -17,10 +18,11 @@ class Player {
 
   // Private constructor
   Player._internal() {
+    audioPlayer = AudioPlayer();
     _init();
   }
 
-  final AudioPlayer audioPlayer = AudioPlayer();
+  late final AudioPlayer audioPlayer;
   late final s.AudioSession session;
   PlayerSt state = PlayerSt.idle;
   int timeEllapsedMilliseconds = 0;
@@ -32,7 +34,10 @@ class Player {
 
   /// Initialization: setup audio session, platform-specific config and listeners
   Future<void> _init() async {
-    JustAudioMediaKit.ensureInitialized();
+    if (Platform.isWindows || Platform.isLinux) {
+      JustAudioMediaKit.ensureInitialized();
+    }
+
     // Setup position tracking
     audioPlayer.positionStream.listen((position) {
       timeEllapsedMilliseconds = position.inMilliseconds;
@@ -61,17 +66,44 @@ class Player {
 
   /// Resume playback if ready
   Future<void> resume() async {
+    final buffer = StringBuffer();
+
     try {
       if ((Platform.isAndroid || Platform.isIOS)) {
-        if (!await session.setActive(true)) {
-          print('Audio session could not be activated');
-          return;
-        }
+        final activated = await session.setActive(true);
+        buffer.writeln('Session activated: $activated');
       }
-      audioPlayer.play();
+
+      await audioPlayer.setVolume(1.0);
+      buffer.writeln('Volume set to: ${audioPlayer.volume}');
+
       _setState(PlayerSt.playing);
+      audioPlayer.play();
+
+      buffer.writeln('Playing: ${audioPlayer.playing}');
     } catch (e) {
-      print('Error resuming playback: $e');
+      buffer.writeln('Error resuming playback: $e');
+    }
+
+    await _writeLogToDownload(buffer.toString());
+  }
+
+  Future<void> _writeLogToDownload(String content) async {
+    try {
+      final dir = Directory('/storage/emulated/0/Download');
+      if (!await dir.exists()) {
+        print("⚠️ Download folder not found.");
+        return;
+      }
+
+      final file = File('${dir.path}/audio_debug_log.txt');
+      await file.writeAsString(
+        '${DateTime.now()}:\n$content\n\n',
+        mode: FileMode.append,
+      );
+      print("✅ Log written to ${file.path}");
+    } catch (e) {
+      print('❌ Failed to write log: $e');
     }
   }
 
@@ -108,8 +140,8 @@ class Player {
   Future<void> changeSongAndPlay(Song song) async {
     try {
       final fileSource = AudioSource.uri(Uri.file(song.path));
-      await audioPlayer.stop();
-      await audioPlayer.setAudioSource(fileSource);
+      await audioPlayer.addAudioSource(fileSource);
+      await audioPlayer.seekToNext();
       await resume();
     } catch (e) {
       print('Error changing song: $e');

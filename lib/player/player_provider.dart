@@ -78,7 +78,13 @@ class PlayerProvider extends ChangeNotifier {
   }
 
   /// Injects the music library into the player provider.
-  void setLibrary(LibraryProvider library) => _musicLibrary = library;
+  bool _isLibrarySet = false;
+  void setLibrary(LibraryProvider library) {
+    if (!_isLibrarySet) {
+      _musicLibrary = library;
+      _isLibrarySet = true;
+    }
+  }
 
   /// Starts playback or resumes the current song if already set.
   Future<void> resume() async {

@@ -11,6 +11,17 @@ import 'package:sync_player/Library/models/model_serializator.dart';
 import 'package:sync_player/main.dart';
 
 class Library {
+  // Singleton instance
+  static final Library _instance = Library._internal();
+
+  // Factory constructor
+  factory Library() {
+    return _instance;
+  }
+
+  // Private constructor
+  Library._internal();
+
   Directories _directories = Directories(paths: []);
   List<Artist> _artists = [];
   final List<Album> _allAlbums = [];

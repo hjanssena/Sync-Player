@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:sync_player/player/player.dart';
 import 'package:sync_player/player/player_provider.dart';
 
 class SongProgressBar extends StatefulWidget {
@@ -13,7 +12,6 @@ class SongProgressBar extends StatefulWidget {
 class _SongProgressBarState extends State<SongProgressBar> {
   double? _dragValue;
   bool _isDragging = false;
-  bool _wasPlayingBeforeDrag = false;
 
   String _formatDuration(int ms) {
     final duration = Duration(milliseconds: ms);
@@ -51,14 +49,7 @@ class _SongProgressBarState extends State<SongProgressBar> {
                   setState(() {
                     _isDragging = true;
                     _dragValue = value;
-                    _wasPlayingBeforeDrag =
-                        playerProvider.getPlayerState() == PlayerSt.playing;
                   });
-
-                  // Auto pause
-                  if (_wasPlayingBeforeDrag) {
-                    playerProvider.pause();
-                  }
                 },
                 onChanged: (value) {
                   setState(() {
@@ -69,15 +60,9 @@ class _SongProgressBarState extends State<SongProgressBar> {
                   final newPosition = (value * totalDuration).toInt();
                   playerProvider.seek(Duration(milliseconds: newPosition));
 
-                  // Resume if it was playing before
-                  if (_wasPlayingBeforeDrag) {
-                    playerProvider.resume();
-                  }
-
                   setState(() {
                     _isDragging = false;
                     _dragValue = null;
-                    _wasPlayingBeforeDrag = false;
                   });
                 },
               ),

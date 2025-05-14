@@ -61,11 +61,11 @@ class PlayerProvider extends ChangeNotifier {
         nextSong();
       }
     });
-    initAudioHandler();
+    _initAudioHandler();
   }
 
   //Initialize the handler for background playback and notification media control
-  Future<void> initAudioHandler() async {
+  Future<void> _initAudioHandler() async {
     audioHandler = await AudioService.init(
       builder:
           () => BackgroundAudioHandler(playerProvider: this) as AudioHandler,
@@ -77,8 +77,8 @@ class PlayerProvider extends ChangeNotifier {
     );
   }
 
+  bool _isLibrarySet = false; //Avoid setting the library again on reload
   /// Injects the music library into the player provider.
-  bool _isLibrarySet = false;
   void setLibrary(LibraryProvider library) {
     if (!_isLibrarySet) {
       _musicLibrary = library;

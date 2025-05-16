@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/library_provider.dart';
 import 'package:sync_player/Library/models/models.dart';
-import 'package:sync_player/Views/Library/list_items.dart';
-import 'package:sync_player/views/Player/player_widget.dart';
+import 'package:sync_player/views/library/list_items.dart';
+import 'package:sync_player/views/player/player_widget.dart';
 
 class AlbumListScreen extends StatelessWidget {
   const AlbumListScreen({super.key});

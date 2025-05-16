@@ -11,6 +11,7 @@ add_executable(${BINARY_NAME}
   "my_application.cc"
   "${FLUTTER_MANAGED_DIR}/generated_plugin_registrant.cc"
 )
+target_include_directories(${BINARY_NAME} PRIVATE /usr/include/c++/4.2.1)
 
 # Apply the standard set of build settings. This can be removed for applications
 # that need different build settings.

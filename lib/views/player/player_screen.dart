@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/models/models.dart';
-import 'package:sync_player/views/Player/components/media_buttons.dart';
 import 'package:sync_player/player/player_provider.dart';
-import 'package:sync_player/views/Player/components/progress_bar.dart';
+import 'package:sync_player/views/player/components/media_buttons.dart';
+import 'package:sync_player/views/player/components/progress_bar.dart';
 
 class PlayerScreen extends StatefulWidget {
   const PlayerScreen({super.key});

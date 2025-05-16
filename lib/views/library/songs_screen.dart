@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_player/Library/library_provider.dart';
-import 'package:sync_player/views/Player/player_widget.dart';
+import 'package:sync_player/views/player/player_widget.dart';
 import 'package:sync_player/views/library/list_items.dart';
 
 class SongListScreen extends StatelessWidget {

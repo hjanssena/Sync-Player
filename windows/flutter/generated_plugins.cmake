@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   audiotags
+  file_selector_windows
   media_kit_libs_windows_audio
   permission_handler_windows
 )

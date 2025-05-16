@@ -2,18 +2,25 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:mime/mime.dart';
+import 'package:file_selector/file_selector.dart' as f;
 
 class DirectoryScanner {
   Future<String> addDirectoryPath() async {
-    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-    if (selectedDirectory != null) {
-      if (Platform.isAndroid) {
-        selectedDirectory = fixDuplicatedEndingInAndroidPath(
-          selectedDirectory.toString(),
-        );
+    if (Platform.isLinux) {
+      String? selectedDirectory = await f.getDirectoryPath();
+      if (selectedDirectory != null) {}
+      return selectedDirectory ?? '';
+    } else {
+      String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
+      if (selectedDirectory != null) {
+        if (Platform.isAndroid) {
+          selectedDirectory = fixDuplicatedEndingInAndroidPath(
+            selectedDirectory.toString(),
+          );
+        }
       }
+      return selectedDirectory ?? '';
     }
-    return selectedDirectory ?? '';
   }
 
   Future<List<String>> getAudioFilePathsFromDirectories(String path) async {

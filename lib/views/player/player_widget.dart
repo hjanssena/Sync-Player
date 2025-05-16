@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:sync_player/Library/models/models.dart';
 import 'package:sync_player/main.dart';
 import 'package:sync_player/player/player.dart';
-import 'package:sync_player/views/Player/components/media_buttons.dart';
+import 'package:sync_player/views/player/components/media_buttons.dart';
 import 'package:sync_player/player/player_provider.dart';
-import 'package:sync_player/views/Player/components/progress_bar.dart';
+import 'package:sync_player/views/player/components/progress_bar.dart';
 import 'package:sync_player/views/player/player_screen.dart';
 
 class PlayerWidget extends StatefulWidget {

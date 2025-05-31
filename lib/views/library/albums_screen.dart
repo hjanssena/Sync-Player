@@ -17,6 +17,7 @@ class AlbumListScreen extends StatelessWidget {
       uuid: '',
       name: "Random ${library.selectedArtist.name}",
       songs: allArtistSongs,
+      created: DateTime.now(),
       lastModified: DateTime.now(),
     );
     return Scaffold(

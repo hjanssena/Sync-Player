@@ -34,7 +34,10 @@ class Song {
   int trackNumber;
   int duration;
   int year;
+  int playCount;
+  bool liked;
   bool scraped;
+  DateTime lastPlayed;
   DateTime lastModified;
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -54,8 +57,11 @@ class Song {
     required this.trackNumber,
     required this.duration,
     required this.year,
+    this.playCount = 0,
+    this.liked = false,
     required this.scraped,
     required this.lastModified,
+    required this.lastPlayed,
   }) : contentHash = _generateContentHash(
          albumArtist,
          trackArtist,
@@ -87,6 +93,7 @@ class Song {
       duration: 0,
       year: 0,
       scraped: false,
+      lastPlayed: DateTime.now(),
       lastModified: DateTime.now(),
     );
   }
@@ -105,9 +112,11 @@ class Album extends PlayList {
     required super.uuid,
     required super.name,
     required super.songs,
+    required super.created,
     required super.lastModified,
     required this.image,
     required this.scraped,
+    super.genres = const [],
   });
 
   static Album empty() {
@@ -117,6 +126,7 @@ class Album extends PlayList {
       songs: const [],
       image: fileCache.placeholderImage,
       scraped: false,
+      created: DateTime.now(),
       lastModified: DateTime.now(),
     );
   }
@@ -130,14 +140,18 @@ class Album extends PlayList {
 class PlayList {
   String uuid;
   String name;
+  DateTime created;
   DateTime lastModified;
+  List<String> genres;
   List<Song> songs;
 
   PlayList({
     required this.uuid,
     required this.name,
+    required this.created,
     required this.lastModified,
     required this.songs,
+    this.genres = const [],
   });
 
   factory PlayList.fromJson(Map<String, dynamic> json) =>
@@ -152,6 +166,7 @@ class Artist {
   @JsonKey(fromJson: _uint8ListFromBase64, toJson: _uint8ListToBase64)
   Uint8List image;
   List<Album> albums;
+  List<String> genres;
   bool scraped;
   DateTime lastModified;
 
@@ -162,6 +177,7 @@ class Artist {
     required this.albums,
     required this.scraped,
     required this.lastModified,
+    this.genres = const [],
   });
 
   static Artist empty() {

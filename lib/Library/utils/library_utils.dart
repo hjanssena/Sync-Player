@@ -20,6 +20,7 @@ class LibraryUtils {
       duration: tag?.duration ?? 0,
       year: tag?.year ?? 2000,
       scraped: false,
+      lastPlayed: DateTime.now(),
       lastModified: DateTime.now(),
     );
     return song;
@@ -33,6 +34,7 @@ class LibraryUtils {
       image: image,
       songs: [],
       scraped: false,
+      created: DateTime.now(),
       lastModified: DateTime.now(),
     );
   }

@@ -1,16 +1,17 @@
-# sync_player
+# Sync Player
 
-A new Flutter project.
+Work in progress.
 
-## Getting Started
+Multiplatform music player that syncs your library between your devices.
 
-This project is a starting point for a Flutter application.
+## Planned platforms
 
-A few resources to get you started if this is your first Flutter project:
+Windows,  MacOS, Android, iOS, Linux.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Screenshots
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<img src="https://atsuro0.s-ul.eu/BdQSVvEZ" height="600" style="display: block">
+
+<img src="https://atsuro0.s-ul.eu/AGYrIWDS" height="600" style="display: block">
+
+<img src="https://atsuro0.s-ul.eu/JXdEOdYr" height="600" style="display: block">
